@@ -35,7 +35,7 @@ function raise(object::PyObject)
     object[:show]()
     convert(Function, object[:raise])()
 end
-function qexec(object::PyObject) = convert(Function, object[:exec])()
+qexec(object::PyObject) = convert(Function, object[:exec])()
 
 ## Make a standard item model from a data frame. SLOW!!!
 qdataframemodel(df) = qdataframemodel(df, nothing)
