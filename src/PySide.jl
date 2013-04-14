@@ -19,7 +19,7 @@ using Mustache
 
 export Qt, QtCore
 export qconnect, qemit, qcall, qt_enum
-export raise
+export raise, qexec
 export qnew_class, qnew_class_instance, qset_method
 
 

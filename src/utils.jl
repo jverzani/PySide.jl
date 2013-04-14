@@ -30,13 +30,14 @@ qt_enum(attr::ASCIIString) = QtCore["Qt"][attr] # want pyobject here
 ## convert text to string ## this is python2 http://pyqt.sourceforge.net/Docs/PyQt4/gotchas.html#python-strings-qt-strings-and-unicode
 ### from_QString(o::PyObject)  = pyeval("str(x)", {:x => o})
 
-
+## show and raise a widget
 function raise(object::PyObject)
     object[:show]()
     convert(Function, object[:raise])()
 end
+function qexec(object::PyObject) = convert(Function, object[:exec])()
 
-## Make a standard item model from a data frame
+## Make a standard item model from a data frame. SLOW!!!
 qdataframemodel(df) = qdataframemodel(df, nothing)
 function qdataframemodel(df, parent)
     model = Qt.QStandardItemModel(parent)
