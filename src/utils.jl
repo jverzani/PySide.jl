@@ -2,6 +2,7 @@
 ##################################################
 ## Utils
 
+
 ## connect a callback to clicked event
 qconnect(callback::Function, object::PyObject, signal::Symbol) = object[signal][:connect](callback)
 qconnect(object::PyObject, signal::Symbol, callback::Function) = object[signal][:connect](callback)
@@ -24,6 +25,9 @@ has_member(object::PyObject, key) = contains(pluck(members(object),1), key)
 ## TODO: generelize to others by passing in second argument
 qt_enum(attr::Symbol) = qt_enum(string(attr))
 qt_enum(attr::ASCIIString) = QtCore["Qt"][attr] # want pyobject here
+## combining enums require us to work in python:
+PyCall.pyeval("execfile(x, globals())", {:x => Pkg.dir("PySide", "tpl", "imports.tpl")})
+qt_enum(attr::Vector{ASCIIString}; how="|") = PyCall.pyeval(join(map(u -> "QtCore.Qt.$u", attr), " $how "))
 
 ## some converstion
 ## This seems unnecessary with PySide
@@ -36,17 +40,6 @@ function raise(object::PyObject)
     convert(Function, object[:raise])()
 end
 qexec(object::PyObject) = convert(Function, object[:exec])()
-
-## Make a standard item model from a data frame. SLOW!!!
-qdataframemodel(df) = qdataframemodel(df, nothing)
-function qdataframemodel(df, parent)
-    model = Qt.QStandardItemModel(parent)
-    for row in 1:nrow(df), col in 1:ncol(df)
-        item = Qt.QStandardItem(string(df[row, col]))
-            qcall(model,:setItem, row-1, col-1, item)
-    end
-    model
-end
 
 
 newclass_tpl = Mustache.template_from_file(Pkg.dir("PySide", "tpl", "newclass.tpl"))

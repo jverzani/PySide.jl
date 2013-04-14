@@ -7,7 +7,7 @@ Examples for the `PySide` package
 
 * `manipulate.jl` an implementation of `RStudio`'s `manipulate` package for R (a stripped down version Mathematica's).
 
-* `dataframe-viewer.jl` a too slow means to view a data frame
+* `data-frame.jl` implements a model for viewing data frames. Can show large data frames without too much lag.
 
 * `webbrowser.jl` simple use of QtWebKit to embed a web page.
 
