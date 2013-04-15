@@ -1,23 +1,25 @@
 using DataFrames
 using PySide
 
-n = 10^2
-d = DataFrame(x = randn(n), x__ToolTipRole = map(u -> randstring(5), 1:n),
-              y = 1:n)
-
 ## DataFrameModel Class
 qnew_class("DataFrameModel", "QtCore.QAbstractTableModel")
 
 
-## WE follow R's qtdataframe and embed roles into the data frame via column names
-## so columns like x__DisplayRole, x__BackgroundRole, ... x__DecorationRole will have info looked up in
-## otherwise, we use these defaults:
+## WE follow R's qtdataframe and embed roles into the data frame via
+## column names so columns like x__DisplayRole, x__BackgroundRole,
+## ... x__DecorationRole will have info looked up in.  we have issues
+## storing the PyObjects in the data frame (they go out of scope when
+## the view is shown) so instead you store strings that get mapped to
+## pyobjects. E.g, for BackgrounRole a color name, for Decoration, a
+## filename of an icon, ..
+##
+## Otherwise, we use these defaults:
 
 display_role(x::DataArray, row::Int) = x[row]
 display_role{T <: Real}(x::DataArray{T}, row::Int) = x[row]
 
+text_alignment_role(x::DataArray, row::Integer) = convert(Int, qt_enum("AlignLeft"))
 text_alignment_role{T <: Real}(x::DataArray{T}, row::Integer) = convert(Int, qt_enum("AlignRight"))
-text_alignment_role(x::DataArray, row::Integer) = convert(Int, qt_enum("AlignCenter"))
 
 background_role(x::DataArray, row::Integer) = Qt.QBrush(Qt.QColor(0,0,0,0))
 foreground_role(x::DataArray, row::Integer) = Qt.QBrush(Qt.QColor("black"))
@@ -25,8 +27,20 @@ foreground_role(x::DataArray, row::Integer) = Qt.QBrush(Qt.QColor("black"))
 tool_tip_role(x::DataArray, row::Integer) = nothing
 whats_this_role(x::DataArray, row::Integer) = nothing
 
-
-
+function make_role(r::String, value)
+    ## some roles require us to do things
+    if  r == "TextAlignmentRole"
+        qt_enum(value)                  # "AlignRight"
+    elseif r == "DecorationRole"
+        Qt.QIcon(value)                 # filename
+    elseif r == "BackgroundRole"
+        Qt.QBrush(Qt.QColor(value))     # "blue"
+    elseif r == "ForegroundRole"
+        Qt.QBrush(Qt.QColor(value))
+    else
+        value
+    end
+end
 
 function DataFrameModel(d; parent=nothing)
     m = qnew_class_instance("DataFrameModel")
@@ -91,7 +105,7 @@ function DataFrameModel(d; parent=nothing)
         for r in roles
             if role == convert(Int, qt_enum(r))
                 role_name = nm * "__" * r
-                out = (contains(cnames, role_name) ? d[row, role_name] : role_default(r, row, nm))
+                out = (contains(cnames, role_name) ? make_role(r, d[row, role_name]) : role_default(r, row, nm))
                 return(out)
             end
         end
@@ -154,8 +168,30 @@ function selected_inidices(view)
 end
     
 
-view = Qt.QTableView()
-m = DataFrameModel(d, parent=view)
-view[:setModel](m)
 
-raise(view)
+## Test it out
+testing = false
+if testing
+    ## test roles
+    d = DataFrame(x=[randstring(10) for i in 1:10],
+                  x__ToolTipRole = [randstring(10) for i in 1:10],
+                  x__BackgroundRole= rep("yellow", 10),
+                  y = 1:10
+                  )
+    view = Qt.QTableView()
+    m = DataFrameModel(d, parent=view)
+    view[:setModel](m)
+    raise(view)
+
+    ## test scaling
+    n = 10^5
+    d = DataFrame(x = randn(n),
+                  y = 1:n)
+        
+    view = Qt.QTableView()
+    m = DataFrameModel(d, parent=view)
+    view[:setModel](m)
+    raise(view)
+end
+             
+              

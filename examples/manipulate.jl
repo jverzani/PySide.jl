@@ -7,12 +7,20 @@
 
 
 using Winston
-using PySide                            # winston first!!
+using PySide                            # winston first! PySide and Winston have issues, likely with event loop
 
 ## We render output into a label. Here are some different renderers...
 function render(parent, p::String)
     parent[:setText](p)
 end
+function render(parent::PyCall.PyObject, p::Winston.FramedPlot)
+    nm = tempname() * ".png"
+    file(p, nm)
+    px = Qt.QPixmap()
+    px[:load](nm)
+    parent[:setPixmap](px)
+end
+
 function render(parent::PyCall.PyObject, p::Winston.FramedPlot)
     nm = tempname() * ".png"
     file(p, nm)
@@ -174,7 +182,6 @@ entry(nm::String) = EntryWidget(nm, nm, "")
 ## Expression returns a plot object. Use names as values
 function manipulate(ex::Union(Symbol,Expr), w, controls...)
 
-#    w = Qt.QWidget()
     lyt = Qt.QHBoxLayout(w)
     w[:setLayout](lyt)
     
@@ -182,7 +189,7 @@ function manipulate(ex::Union(Symbol,Expr), w, controls...)
     lyt[:addWidget](pg)
     
     control_pane = Qt.QWidget(pg)
-    graph = Qt.QLabel(pg)
+    graph = Qt.QLabel(pg)               # This would be QtSvg.QSvgWidget if using Gadfly
     pg[:addWidget](control_pane)
     pg[:addWidget](graph)
     
@@ -220,6 +227,7 @@ function manipulate(ex::Union(Symbol,Expr), w, controls...)
         p = eval(ManipulateContext, ex)
         render(graph, p)
     end
+    
     map(u -> change_handler(u, make_graphic), controls)
     make_graphic()
     controls

@@ -1,4 +1,5 @@
 ## show an svg file
+## reload(Pkg.dir("PySide", "examples", "svg.jl"))
 
 using PySide
 using Gadfly, Compose
@@ -12,6 +13,7 @@ lyt[:addWidget](sv)
 
 sl = Qt.QSlider(qt_enum("Horizontal"), w)
 lyt[:addWidget](sl)
+
 rng = 2:10
 sl[:setMinimum](min(rng))
 sl[:setMaximum](max(rng))
@@ -26,8 +28,6 @@ end
 
 draw_plot(1)
 
-qconnect(sl, :valueChanged) do value
-  draw_plot(value)
- end
+qconnect(sl, :valueChanged, draw_plot) ## value changed passes in value to slot
 
 raise(w)

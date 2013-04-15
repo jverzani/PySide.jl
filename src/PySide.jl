@@ -17,7 +17,7 @@ using Mustache
 @pyimport PySide.QtWebKit as QtWebKit
 @pyimport sys
 
-export Qt, QtCore
+export Qt, QtCore, QtSvg, QtWebkit
 export qconnect, qemit, qcall, qt_enum
 export raise, qexec
 export qnew_class, qnew_class_instance, qset_method
