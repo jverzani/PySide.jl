@@ -10,17 +10,66 @@ using Mustache
 
 
 ## 
-#@pyimport PySide ## need new name if this is needed
-@pyimport PySide.QtGui as  Qt
-@pyimport PySide.QtCore as QtCore
-@pyimport PySide.QtSvg as QtSvg
+@pyimport PySide.QtGui    as Qt
+@pyimport PySide.QtCore   as QtCore
+@pyimport PySide.QtSvg    as QtSvg
 @pyimport PySide.QtWebKit as QtWebKit
 @pyimport sys
 
+import Base.getindex, Base.setindex!, Base.push!, Base.pop!, Base.delete!
+
+include("utils.jl")
+include("qtutils.jl")
+include("qtextras.jl")
+## include("data-frame-model.jl")  ## XXX uncomment, but loads in DataFrames, so slow...
+
 export Qt, QtCore, QtSvg, QtWebkit
 export qconnect, qemit, qcall, qt_enum
-export raise, qexec
+export qexec
 export qnew_class, qnew_class_instance, qset_method
+export qinvoke
+export get_value, set_value, get_items, set_items, change_slot
+export Icon, Label, PushButton, Button, 
+       Slider, SpinBox,
+       LineEdit, TextEdit,   
+       CheckBox, RadioButton, RadioGroup,
+       ComboBox,
+       MainWindow, DockWidget, Widget,
+       VBoxLayout, HBoxLayout, FormLayout, GridLayout,
+       TabWidget, StackedLayout, Splitter,
+       ButtonGroup, GroupBox
+
+#export Views...
+
+export StandardItemModel
+#export DataFrameModel ## XXX
+
+export windowTitle, setWindowTitle, 
+       text,setText,
+       toPlainText, setPlainText,
+       html, setHtml,
+       setPlaceholderText,
+       value, setValue,       
+       setIcon,        
+       setLayout,      
+       addWidget, addLayout, addTab, addRow, insertRow, setWidget,
+       setCentralWidget,
+       setOrientation
+
+export setFocus, raise 
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -46,7 +95,6 @@ function init()
     Base.start_timer(timeout,int64(20),int64(20))
 end
 
-include("utils.jl")
 
 init()
 end

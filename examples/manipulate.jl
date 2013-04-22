@@ -66,7 +66,7 @@ get_value(widget::SliderWidget) = widget.w[:value]()
 
 slider(nm::String, label::String, rng::Range1, initial::Integer) = SliderWidget(nothing, nm, label, initial, rng)
 slider(nm::String, label::String, rng::Range1) = slider(nm, label, rng, min(rng))
-slider(nm::String,  rng::Range1) = slider(nm, nm, rng, min(rng))
+slider(nm::String,  rng::Union(Range, Range1)) = slider(nm, nm, rng, min(rng))
 
 ##################################################
 

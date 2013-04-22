@@ -10,3 +10,6 @@ class {{:NewClass}}({{:OldClass}}):
     def __init__(self):
         super({{:NewClass}}, self).__init__()
         
+    {{#:methods}}
+    {{{:meth_dfn}}}
+    {{/:methods}}
