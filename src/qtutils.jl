@@ -13,18 +13,13 @@ qemit(object::PyObject, signal::Symbol) = qemit(object, "$signal()")
 ## o[:symbol](xs...) -> qcall(o, :symbol, xs...)
 qcall(object::PyObject, member::Symbol, args...) = object[member](args...)
 
-function members(object::PyObject)
-    convert(Vector{(String,PyObject)}, 
-            pycall(PyCall.inspect["getmembers"], PyObject, object))
-end
-has_member(object::PyObject, key) = contains(pluck(members(object),1), key)
-
 ## get Qt.Qt.enum as pyobject (http://qt-project.org/doc/qt-4.8/qt.html)
 ## TODO: generelize to others by passing in second argument
 qt_enum(attr::Symbol) = qt_enum(string(attr))
 qt_enum(attr::ASCIIString) = QtCore["Qt"][attr] # want pyobject here
+
 ## combining enums require us to work in python:
-PyCall.pyeval("execfile(x, globals())", {:x => Pkg.dir("PySide", "tpl", "imports.tpl")})
+PyCall.pyeval("execfile(x, globals())", x = Pkg.dir("PySide", "tpl", "imports.tpl"))
 qt_enum(attr::Vector{ASCIIString}; how="|") = PyCall.pyeval(join(map(u -> "QtCore.Qt.$u", attr), " $how "))
 
 ## some converstion
@@ -49,6 +44,7 @@ function qnew_class(name::ASCIIString, parent::ASCIIString; meths=nothing)
     d = {:NewClass=>name, :OldClass=>parent}
     if !isa(meths, Nothing) d[:methods] = meths end
     out = Mustache.render(io, newclass_tpl, d)
+    println(out)
     close(io)
     PyCall.pyeval("execfile('$tmp', globals())")
 end

@@ -20,20 +20,22 @@ type TextEdit   <: QtWidget w::PyObject;  TextEdit(parent)   = new(Qt.QTextEdit(
 type CheckBox   <: QtWidget w::PyObject;  CheckBox(parent)   = new(Qt.QCheckBox(project(parent)))   end
 type RadioButton<: QtWidget w::PyObject;  RadioButton(parent)= new(Qt.QRadioButton(project(parent)))end    
 type ComboBox   <: QtWidget w::PyObject;  ComboBox(parent)   = new(Qt.QComboBox(project(parent)))   end
+type TableView   <: QtWidget w::PyObject;  TableView(parent)   = new(Qt.QTableView(project(parent)))   end
 ## XXX
 
 type VBoxLayout <: QtLayout w::PyObject;  VBoxLayout(parent) = new(Qt.QVBoxLayout(project(parent))) end
 type HBoxLayout <: QtLayout w::PyObject;  HBoxLayout(parent) = new(Qt.QHBoxLayout(project(parent))) end
 type FormLayout <: QtLayout w::PyObject;  FormLayout(parent) = new(Qt.QFormLayout(project(parent))) end
 type GridLayout <: QtLayout w::PyObject;  GridLayout(parent) = new(Qt.QGridLayout(project(parent))) end
-type TabWidget <: QtLayout w::PyObject;  TabWidget(parent) = new(Qt.QTabWidget(project(parent))) end
-type Splitter <: QtLayout w::PyObject;  Splitter(parent) = new(Qt.QSplitter(project(parent))) end
+type TabWidget  <: QtLayout w::PyObject;  TabWidget(parent)  = new(Qt.QTabWidget(project(parent))) end
+type Splitter   <: QtLayout w::PyObject;  Splitter(parent)   = new(Qt.QSplitter(project(parent))) end
 type StackedLayout <: QtLayout w::PyObject;  StackedLayout(parent) = new(Qt.QStackedLayout(project(parent))) end
 
 type ButtonGroup<: QtWidget w::PyObject;  ButtonGroup(parent)= new(Qt.QButtonGroup(project(parent)))end
 type GroupBox   <: QtWidget w::PyObject;  GroupBox(parent)   = new(Qt.QGroupBox(project(parent)))   end
 
 
+type Pixmap     <: QtWidget w::PyObject;  Pixmap(parent)     = new(Qt.QPixmap(project(parent)))    end
     
 
 ## inovke a method with args
@@ -41,7 +43,7 @@ type GroupBox   <: QtWidget w::PyObject;  GroupBox(parent)   = new(Qt.QGroupBox(
 qinvoke(widget::AWidget, method::Symbol, args...) = project(widget)[method](map(project, args)...)
 
 import Base.getindex
-getindex(widget::QtWidget, i::Symbol) = widget.w[i]
+getindex(widget::QtWidget, i::Symbol) = (args...) -> qinvoke(widget, i, args...)
 
 ## We implement these methods for easier programming of common tasks
 get_value(object::QtWidget) = XXX()
@@ -68,6 +70,7 @@ qconnect(widget::QtWidget, signal::Symbol, slot::Slot) =
 ## Maybes
 MaybeQtWidget = Union(Nothing, QtWidget)
 MaybeString = Union(Nothing, String)
+MaybeSymbol = Union(Nothing, Symbol)
 
 ## project down to PyObject space otherwise pass through
 project(widget) = widget
@@ -86,8 +89,10 @@ for nm in (:windowTitle,
            :setHtml,
            :value,          
            :setValue,       
-           
+           :setModel,
            :setIcon,        
+           :load,
+           :setPixmap,
            
            :setLayout,      
            :addWidget,
@@ -218,6 +223,8 @@ end
 ## Controls
 ## Icon Icon("filename.gif")
 
+## Pixmap (Uses file name, not parent object
+
 ## Label
 function Label(parent, label::String)
     l = Label(parent)
@@ -288,7 +295,7 @@ setPlaceholderText(widget::LineEdit, value::String) = qinvoke(widget, :setPlaceH
 ## icons, validator,
 
 get_value(widget::LineEdit) = text(widget)
-set_value(widget::LineEdit, value) = setText(Widget, string(value))
+set_value(widget::LineEdit, value) = setText(widget, string(value))
 function get_items(widget::LineEdit)    #  for completion
     completer = qinvoke(widget, :completer)
     model = qinvoke(completer, :model)  # StandardItemModel
@@ -327,7 +334,7 @@ get_value(widget::CheckBox) = qinvoke(widget, :isChecked)
 set_value(widget::CheckBox, value::Bool) = qinvoke(widget, :setCheckState, qt_enum(value ? "Checked" : "Unchecked"))
 get_items(widget::CheckBox) = text(widget)
 set_items(widget::CheckBox, value::String) = setText(widget, value)
-
+change_slot(widget::CheckBox, slot::Slot) = qconnect(widget, :stateChanged, (int) -> slot(get_value(widget)))
     
 ## RadioButton
 get_value(widget::RadioButton) = qinvoke(widget, :isChecked)
@@ -474,4 +481,51 @@ end
     
 set_items{T<:String}(model::StandardItemModel, items::Vector{T}, icon::Vector{Icon}) = set_items(model, items, items, icon)
 
-    
+
+
+## Dialogs, don't have classes
+
+## Message Box
+## icon is symbol in :NoIcon, :Question, :Information, :Warning, :Critical
+function MessageBox(parent, title::MaybeString, text::MaybeString, informative_text::MaybeString, icon::MaybeSymbol)
+    mb = Qt.QMessageBox(project(parent))
+    if !isa(title, Nothing) setWindowTitle(mb, title) end
+    if !isa(text, Nothing) setText(mb, text) end
+    if !isa(informative_text, Nothing)  setInformativeText(mb, informative_text) end
+    if !isa(icon, Nothing)  mb[:setIcon](mb[icon]) end
+    convert(Function, mb[:exec])()
+end
+
+MessageBox(parent::AWidget, text::String) = MessageBox(parent, nothing, text, nothing, nothing)
+MessageBox(parent::AWidget, text::String, icon::Symbol) = MessageBox(parent, nothing, text, nothing, icon)
+MessageBox(parent::AWidget, title::String, text::String) = MessageBox(parent, title, text, nothing, nothing)
+MessageBox(parent::AWidget, title::String, text::String, informative_text::String) = MessageBox(parent, title, text, informative_text, nothing)
+
+## InputDialog
+function InputDialog(parent,  title::MaybeString, label::MaybeString, initial::MaybeString)
+    dlg = Qt.QInputDialog(parent)
+    if !isa(title, Nothing)   setWindowTitle(dlg, title)  end
+    if !isa(label, Nothing)   dlg[:setLabelText](label)   end
+    if !isa(initial, Nothing) dlg[:setTextValue](initial) end
+    out = convert(Function, dlg[:exec])()
+    out == 1 ? dlg[:textValue]() : ""
+end
+
+## how: file, files, dir, save
+function FileDialog(parent, how::String, args...)
+    fd = Qt.QFileDialog()
+
+    if how == "file"
+        out = fd[:getOpenFileName](parent, args...)
+    elseif how == "files"
+        out = fd[:getOpenFileNames](parent, args...)
+    elseif how == "dir"
+        out = fd[:getExistingDirectory](parent, args...)
+    elseif how == "save"
+        out = fd[:getSaveFileName](parent, args...)
+    else
+        out = fd[:getOpenFileName](parent, args...)
+    end
+    out[1]    
+end
+        

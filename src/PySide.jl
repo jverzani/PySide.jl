@@ -7,7 +7,7 @@ module PySide
 ## initialize
 using PyCall
 using Mustache
-
+using DataFrames
 
 ## 
 @pyimport PySide.QtGui    as Qt
@@ -17,58 +17,6 @@ using Mustache
 @pyimport sys
 
 import Base.getindex, Base.setindex!, Base.push!, Base.pop!, Base.delete!
-
-include("utils.jl")
-include("qtutils.jl")
-include("qtextras.jl")
-## include("data-frame-model.jl")  ## XXX uncomment, but loads in DataFrames, so slow...
-
-export Qt, QtCore, QtSvg, QtWebkit
-export qconnect, qemit, qcall, qt_enum
-export qexec
-export qnew_class, qnew_class_instance, qset_method
-export qinvoke
-export get_value, set_value, get_items, set_items, change_slot
-export Icon, Label, PushButton, Button, 
-       Slider, SpinBox,
-       LineEdit, TextEdit,   
-       CheckBox, RadioButton, RadioGroup,
-       ComboBox,
-       MainWindow, DockWidget, Widget,
-       VBoxLayout, HBoxLayout, FormLayout, GridLayout,
-       TabWidget, StackedLayout, Splitter,
-       ButtonGroup, GroupBox
-
-#export Views...
-
-export StandardItemModel
-#export DataFrameModel ## XXX
-
-export windowTitle, setWindowTitle, 
-       text,setText,
-       toPlainText, setPlainText,
-       html, setHtml,
-       setPlaceholderText,
-       value, setValue,       
-       setIcon,        
-       setLayout,      
-       addWidget, addLayout, addTab, addRow, insertRow, setWidget,
-       setCentralWidget,
-       setOrientation
-
-export setFocus, raise 
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -97,4 +45,71 @@ end
 
 
 init()
+
+
+
+include("utils.jl")
+include("qtutils.jl")
+include("qtextras.jl")
+include("data-frame-model.jl")  ##  loads in DataFrames, so slow...
+
+export Qt, QtCore, QtSvg, QtWebkit
+export qconnect, qemit, qcall, qt_enum
+export qexec
+export qnew_class, qnew_class_instance, qset_method
+export qinvoke
+export get_value, set_value, get_items, set_items, change_slot
+
+## widgets/controls
+export Icon, Pixmap, Label, PushButton, Button, 
+       Slider, SpinBox,
+       LineEdit, TextEdit,   
+       CheckBox, RadioButton, RadioGroup,
+       ComboBox
+
+## models
+export StandardItemModel, DataFrameModel
+
+## views
+export TableView   
+
+## container like
+export MainWindow, DockWidget, Widget,
+       VBoxLayout, HBoxLayout, FormLayout, GridLayout,
+       TabWidget, StackedLayout, Splitter,
+       ButtonGroup, GroupBox
+
+## dialogs
+export MessageBox, InputDialog, FileDialog
+
+## methods
+export windowTitle, setWindowTitle, 
+       text,setText,
+       toPlainText, setPlainText,
+       html, setHtml,
+       setPlaceholderText,
+       value, setValue,
+       setModel,
+       setIcon, setPixmap, load,       
+       setLayout,      
+       addWidget, addLayout, addTab, addRow, insertRow, setWidget,
+       setCentralWidget,
+       setOrientation
+
+export setFocus, raise 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 end

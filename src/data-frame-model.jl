@@ -1,7 +1,6 @@
-using DataFrames
+## Need to work on item delegates: http://qt-project.org/doc/qt-4.8/demos-spreadsheet-spreadsheetdelegate-cpp.html
 
-## DataFrameModel Class
-qnew_class("DataFrameModel", "QtCore.QAbstractTableModel")
+
 
 
 ## WE follow R's qtdataframe and embed roles into the data frame via
@@ -14,17 +13,21 @@ qnew_class("DataFrameModel", "QtCore.QAbstractTableModel")
 ##
 ## Otherwise, we use these defaults:
 
-display_role(x::DataArray, row::Int) = x[row]
-display_role{T <: Real}(x::DataArray{T}, row::Int) = x[row]
+display_role(x::DataFrames.DataArray, row::Int) = x[row]
+display_role{T <: Real}(x::DataFrames.DataArray{T}, row::Int) = x[row]
 
-text_alignment_role(x::DataArray, row::Integer) = convert(Int, qt_enum("AlignLeft"))
-text_alignment_role{T <: Real}(x::DataArray{T}, row::Integer) = convert(Int, qt_enum("AlignRight"))
+edit_role(x::DataFrames.DataArray, row::Int) = x[row]
+edit_role{T <: Real}(x::DataFrames.DataArray{T}, row::Int) = x[row]
 
-background_role(x::DataArray, row::Integer) = Qt.QBrush(Qt.QColor(0,0,0,0))
-foreground_role(x::DataArray, row::Integer) = Qt.QBrush(Qt.QColor("black"))
 
-tool_tip_role(x::DataArray, row::Integer) = nothing
-whats_this_role(x::DataArray, row::Integer) = nothing
+text_alignment_role(x::DataFrames.DataArray, row::Integer) = convert(Int, qt_enum("AlignLeft"))
+text_alignment_role{T <: Real}(x::DataFrames.DataArray{T}, row::Integer) = convert(Int, qt_enum("AlignRight"))
+
+background_role(x::DataFrames.DataArray, row::Integer) = Qt.QBrush(Qt.QColor(0,0,0,0))
+foreground_role(x::DataFrames.DataArray, row::Integer) = Qt.QBrush(Qt.QColor("black"))
+
+tool_tip_role(x::DataFrames.DataArray, row::Integer) = nothing
+whats_this_role(x::DataFrames.DataArray, row::Integer) = nothing
 
 function make_role(r::String, value)
     ## some roles require us to do things
@@ -44,21 +47,25 @@ end
 
 ## A DataFrameModel allows the contents of a data frame to set the model items
 ## Changes to the data frame are propogated to the views, one need not update the model.
-type DataFrameModel <: QtWidget
+type DataFrameModel <: PySide.QtWidget
     w
-    function DataFrameModel(parent) 
+    d
+    function DataFrameModel(parent)
+        qnew_class("DataFrameModel", "QtCore.QAbstractTableModel")
         m = qnew_class_instance("DataFrameModel")
-        qinvoke(m, :setParent, parent)
-        new(m)
+        qinvoke(m, :setParent, project(parent))
+        new(m, nothing)
     end
 end
 
-function DataFrameModel(d, parent)
+function DataFrameModel(d, parent; editable=false)
     m = DataFrameModel(parent)
-    set_items(m, d)
+    set_items(m, d; editable=editable)
 end
 
-function set_items(m::DataFrameModel, d::DataFrame)
+function set_items(m::DataFrameModel, d::DataFrames.DataFrame; editable=false)
+    m.d = d
+    
     role_re  = r"__[a-zA-Z]+Role$"
     nms = filter(u -> !ismatch(role_re, u), colnames(d))
 
@@ -92,23 +99,23 @@ function set_items(m::DataFrameModel, d::DataFrame)
 
         
         ## check the rol
-        cnames = colnames(d)
+        cnames = colnames(m.d)
         roles = ["DisplayRole", "EditRole", "TextAlignmentRole", "BackgroundRole", "ForegroundRole", "ToolTipRole", "WhatsThisRole"]
         function role_default(r, row, col)
             if r == "DisplayRole"
-                display_role(d[:,col], row)
+                display_role(m.d[:,col], row)
             elseif r == "EditRole"
-                edit_role(d[:,col], row)
+                edit_role(m.d[:,col], row)
             elseif r == "TextAlignmentRole"
-                text_alignment_role(d[:,col], row)
+                text_alignment_role(m.d[:,col], row)
             elseif r == "BackgroundRole"
-                background_role(d[:,col], row)
+                background_role(m.d[:,col], row)
             elseif r == "ForegroundRole"
                 foreground_role(d[:,col], row)
             elseif r == "ToolTipRole"
-                tool_tip_role(d[:,col], row)
+                tool_tip_role(m.d[:,col], row)
             elseif r == "WhatsThisRole"
-                whats_this_role(d[:,col], row)
+                whats_this_role(m.d[:,col], row)
             else
                 nothing
             end
@@ -116,7 +123,7 @@ function set_items(m::DataFrameModel, d::DataFrame)
         for r in roles
             if role == convert(Int, qt_enum(r))
                 role_name = nm * "__" * r
-                out = (contains(cnames, role_name) ? make_role(r, d[row, role_name]) : role_default(r, row, nm))
+                out = (contains(cnames, role_name) ? make_role(r, m.d[row, role_name]) : role_default(r, row, nm))
                 return(out)
             end
         end
@@ -124,8 +131,8 @@ function set_items(m::DataFrameModel, d::DataFrame)
     end
     m.w[:data] = do_role
 
-    ## editable must implement setData(idx, value, role) and flags(idx) also headerData()
-    ## Header data
+    
+    ##  Well behaved models will also implement headerData().
     function header_data(section::Int, orient, role)
         if orient.o ==  qt_enum("Horizontal").o #  match pointers
             ## column, section is column
@@ -135,43 +142,37 @@ function set_items(m::DataFrameModel, d::DataFrame)
         end
     end
     project(m)[:headerData] = header_data
+
+    ## Editable models need to implement setData(), and implement flags() to return a value containing Qt::ItemIsEditable.
+    if editable 
+        function flags(idx)
+            if !idx[:isValid]() return(qt_enum("ItemIsEnabled")) end
             
-
-    function flags(idx)
-        if !idx[:isValid]() return(qt_enum("ItemIsEnabled")) end
+            row = idx[:row]()
+            col = idx[:column]() + 1
+            qt_enum(["ItemIsSelectable", "ItemIsEditable", "ItemIsEnabled"], how="|")
+        end
+        project(m)[:flags] = flags 
         
-        row = idx[:row]()
-        col = idx[:column]() + 1
-        qt_enum(["ItemIsSelectable", "ItemIsEditable"], how="|")
-        qt_enum("NoItemFlags")
-
-    end
-    ## This isn't working, though not clear why not. The seleciton just gets messed up, but
-    ## can't get editing to work
-#    project(m)[:flags] = flags 
-
-    function set_data(idx, value, role)
-        if !idx[:isValid]() return end
-
-        row = idx[:row]() + 1
-        col = idx[:column]() + 1
-        nm = nms[col]
-
-        println(role)
-        d[row, col] = value
-
-        project(m)[:dataChanged][:emit](idx, idx)
-        true
-    end
-    project(m)[:setData] = set_data
-    
-    
+        function set_data(idx, value, role)
+            if !idx[:isValid]() return end
+            
+            row = idx[:row]() + 1
+            col = idx[:column]() + 1 
+            nm = nms[col]
+            m.d[row, nm] = value
+            
+            project(m)[:dataChanged][:emit](idx, idx)
+        end
+        project(m)[:setData] = set_data
+        
+    end    
     m
 end
-
-## return array of selected values in [row,col] format
-function selected_inidices(view)
-    sel_model = view[:selectionModel]()
+    
+    ## return array of selected values in [row,col] format
+function selected_indicies(view)
+    sel = view[:selectionModel]()
     if !sel[:hasSelection]() return [] end
 
     idxs = sel[:selectedIndexes]()
@@ -206,5 +207,7 @@ end
 ## end
              
               
+
+
 
 
