@@ -1,5 +1,6 @@
-## simple workspace browser for julia
+## simple workspace browser for julia, not the prettiest of things.
 using PySide
+using DataFrames
 
 ## Some functions to work with a module
 function get_names(m::Module)
@@ -66,30 +67,28 @@ end
 global nm_filter = nothing
 global obj_filter = nothing
 
-## pull in data frame model
-reload(Pkg.dir("PySide", "examples", "data-frame.jl"))
 
 function make_dataframe()
     d = get_names_summaries(Main, nm_filter, obj_filter)
-    d = DataFrame(Variable=d[:,1],
-                  Variable__BackgroundRole= rep("goldenrod", size(d)[1]),
+    d = DataFrames.DataFrame(Variable=d[:,1],
+                  Variable__BackgroundRole= DataFrames.rep("goldenrod", size(d)[1]),
                   Description=d[:,2])
     d
 end
 
 ## Simple interface
-w = Qt.QWidget()
+w = Widget()
 w[:resize](500, 400)
-w[:setWindowTitle]("Workspace browser")
-lyt = Qt.QVBoxLayout(w)
-w[:setLayout](lyt)
+setWindowTitle(w, "Workspace browser")
+lyt = VBoxLayout(w)
+setLayout(w, lyt)
 
 ## View of objects
-view = Qt.QTableView(w)
-lyt[:addWidget](view, 1)
+view = TableView(w)
+addWidget(lyt, view)
 
-m = DataFrameModel(make_dataframe(), parent=view)
-view[:setModel](m)
+m = DataFrameModel(make_dataframe(), view)
+setModel(view, m)
 
 
 
@@ -102,43 +101,42 @@ header[:hide]()
 view[:resizeColumnToContents](0)
 
 function update(view)
-    m = DataFrameModel(make_dataframe(), parent=view)
-   view[:setModel](m)
+    m = DataFrameModel(make_dataframe(), view)
+    setModel(view, m)
 end
 
 
 ## Name Filter combobox
-ed = Qt.QLineEdit(w)
+ed = LineEdit(w)
 qconnect(ed, :editingFinished) do
-  val = ed[:text]()
+  val = text(ed)
   global nm_filter
   nm_filter = length(val) > 0 ? u -> ismatch(Regex(val), u) : nothing
   update(view)
 end
 ## Object Filter combobox
-cb = Qt.QComboBox(w)
-cb[:setModel](Qt.QStringListModel(["none", "Function", "PyObject", "Module"], cb))
+cb = ComboBox(w)
+set_items(cb, ["none", "Function", "PyObject", "Module"])
 qconnect(cb, :activated) do idx
    di = {"none" => nothing,
          "Function" => u -> isa(u, Function),
          "PyObject" => u -> isa(u, PyCall.PyObject),
          "Module" => u -> isa(u, Module)
          }
-    m = cb[:model]()
-    cur_index = m[:index](idx, 0)
-    val = cur_index[:data]()
+
+    val = get_value(cb)
 
     global obj_filter
     obj_filter = di[val]
     update(view)
 end
 
-flyt = Qt.QFormLayout()
+flyt = FormLayout(w)
 flyt[:setAlignment](qt_enum(["AlignLeft", "AlignTop"], how="|"))
-lyt[:addLayout](flyt, 0)
+addLayout(lyt, flyt)
 
-flyt[:addRow]("Name filter:", ed)
-flyt[:addRow]("Type filter:", cb)
+addRow(flyt, "Name filter:", ed)
+addRow(flyt, "Type filter:", cb)
 
 
 

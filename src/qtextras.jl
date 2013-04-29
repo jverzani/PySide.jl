@@ -20,8 +20,16 @@ type TextEdit   <: QtWidget w::PyObject;  TextEdit(parent)   = new(Qt.QTextEdit(
 type CheckBox   <: QtWidget w::PyObject;  CheckBox(parent)   = new(Qt.QCheckBox(project(parent)))   end
 type RadioButton<: QtWidget w::PyObject;  RadioButton(parent)= new(Qt.QRadioButton(project(parent)))end    
 type ComboBox   <: QtWidget w::PyObject;  ComboBox(parent)   = new(Qt.QComboBox(project(parent)))   end
-type TableView   <: QtWidget w::PyObject;  TableView(parent)   = new(Qt.QTableView(project(parent)))   end
+type TableView  <: QtWidget w::PyObject;  TableView(parent)  = new(Qt.QTableView(project(parent)))  end
 ## XXX
+type Action     <: QtWidget w::PyObject;  Action(parent)     = new(Qt.QAction(project(parent)))     end
+type ActionGroup   <: QtWidget w::PyObject;  ActionGroup(parent)   = new(Qt.QActionGroup(project(parent)))   end
+type MenuBar    <: QtWidget w::PyObject;  MenuBar(parent)    = new(Qt.QMenuBar(project(parent)))    end
+type Menu       <: QtWidget w::PyObject;  Menu(parent)       = new(Qt.QMenu(project(parent)))       end
+
+type GraphicsScene <: QtWidget w::PyObject;  GraphicsScene(parent)       = new(Qt.QGraphicsScene(project(parent)))       end
+type GraphicsView <: QtWidget w::PyObject;  GraphicsView(parent)       = new(Qt.QGraphicsView(project(parent)))       end
+
 
 type VBoxLayout <: QtLayout w::PyObject;  VBoxLayout(parent) = new(Qt.QVBoxLayout(project(parent))) end
 type HBoxLayout <: QtLayout w::PyObject;  HBoxLayout(parent) = new(Qt.QHBoxLayout(project(parent))) end
@@ -41,9 +49,27 @@ type Pixmap     <: QtWidget w::PyObject;  Pixmap(parent)     = new(Qt.QPixmap(pr
 ## inovke a method with args
 ## widget[:method](args)
 qinvoke(widget::AWidget, method::Symbol, args...) = project(widget)[method](map(project, args)...)
+## invoke ala widget[:meth1]()[:meth2]()...[:methn](args...)
+function qinvoke(widget::AWidget, methods::Vector{Symbol}, args...)
+    f(widget, method) = widget[method]()
+    if length(methods) > 1
+        qinvoke(reduce(f, widget, methods[1:(end-1)]), methods[end], args...)
+    else
+        qinvoke(widget, methods[1], args...)
+    end
+end
+
+
 
 import Base.getindex
-getindex(widget::QtWidget, i::Symbol) = (args...) -> qinvoke(widget, i, args...)
+function getindex(widget::QtWidget, i::Symbol)
+    if isa(project(widget)[i], Function)
+        (args...) -> qinvoke(widget, i, args...)
+    else
+        widget[i]
+    end
+end
+getindex(widget::QtWidget, i::String) = project(widget)[string]
 
 ## We implement these methods for easier programming of common tasks
 get_value(object::QtWidget) = XXX()
@@ -69,6 +95,7 @@ qconnect(widget::QtWidget, signal::Symbol, slot::Slot) =
 
 ## Maybes
 MaybeQtWidget = Union(Nothing, QtWidget)
+MaybePyObject = Union(Nothing, PyObject)
 MaybeString = Union(Nothing, String)
 MaybeSymbol = Union(Nothing, Symbol)
 
@@ -93,6 +120,10 @@ for nm in (:windowTitle,
            :setIcon,        
            :load,
            :setPixmap,
+           :addAction,
+           :addMenu,
+           :addSeparator,
+
            
            :setLayout,      
            :addWidget,
@@ -150,6 +181,14 @@ setSpacing(lyt::QtLayout, px::Integer) = qinvoke(lyt, :setSpacing, px)
 
 ## julia array-like interfaces for adding, inserting and deleting a widget
 push!(lyt::QtLayout, widget::AWidget) = addWidget(lyt, widget)
+function push!(parent::Widget, child::AWidget)
+    lyt = qinvoke(parent, :layout)
+    if isa(lyt, Nothing) lyt = VBoxLayout(parent); setLayout(parent, lyt) end
+    addWidget(lyt, child)
+end
+push!(parent::MainWindow, child::AWidget) = setCentralWidget(parent, child)
+
+## delete
 setindex!(lyt::QtLayout, widget::AWidget, i::Int) = qinvoke(lyt, :insertWidget, i, widget)
 function delete!(lyt::QtLayout, widget::AWidget)
     qinvoke(lyt, :removeWidget, widget)
@@ -481,9 +520,28 @@ end
     
 set_items{T<:String}(model::StandardItemModel, items::Vector{T}, icon::Vector{Icon}) = set_items(model, items, items, icon)
 
+##################################################
+## Menus
+function Menu(title::String, parent::AWidget)
+    menu = Menu(parent)
+    menu[:setTitle](title)
+    menu
+end
 
+function Action(text::MaybeString, icon::MaybeString,   shortcut::MaybePyObject, tooltip::MaybeString, parent::AWidget)
+    a = Action(parent)
+    if !isa(text, Nothing)  setText(a, text) end
+    if !isa(icon, Nothing)  setIcon(a, icon) end
+    if !isa(shortcut, Nothing) a[:setShortcut](shortcut) end # Qt.QKeySequence object
+    if !isa(tooltip, Nothing)  setToolTip(a, tooltip) end
+    a
+end
+Action(text::String, parent::AWidget) = Action(text, nothing, nothing, nothing, parent)
+Action(text::String, icon::String, parent::AWidget) = Action(text, icon, nothing, nothing, parent)
+Action(text::String, icon::String, shortcut::PyObject, parent::AWidget) = Action(text, icon, shortcut, nothing, parent)
+change_slot(parent::Action, slot::Slot) = qconnect(parent, :triggered, slot)
 
-## Dialogs, don't have classes
+## dialogs, don't have classes
 
 ## Message Box
 ## icon is symbol in :NoIcon, :Question, :Information, :Warning, :Critical

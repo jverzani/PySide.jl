@@ -46,8 +46,42 @@ raise(w)			# show and raise widget
 ```
 
 
-### TODO
+### A (slightly) more convenient interface
 
-* the data frame example is really slow. Need to speed this up.
-* more examples
-* check if this works on other setups.
+We also provide a slightly more convenient interface for common tasks. The hello world example could be:
+
+```
+
+using PySide			# imports Qt, QtCore (Qt is QtGui)
+
+w = Widget()
+setWindowTitle(w, "Hello world example (redux)") # methodName(object, args...)
+lyt = VBoxLayout(w)		# we require a parent for all but Widget, MainWindow
+setLayout(w, lyt)
+
+btn = Button(w)
+setText(btn, "Click me")
+push!(lyt, btn)			# alternative to addWidget(lyt, btn)
+
+qconnect(btn, :clicked) do	# also change_slot(btn, () -> MessageBox(...))
+  MessageBox(btn, "Hi there", :Information)
+end
+
+raise(w)
+```	
+
+The constructors have some conveniences. As un-parented objects can go
+out of scope, we require a parent to be passed in to all but the
+top-level objects (`Widget` or `MainWindow`).
+
+The methods have the basic signature `methodName(object,
+args...)`. Alternatively, one can call as
+`object[:methodName](args...)`. The latter is possible even if a
+convenience method is not created.
+
+
+The main point of this is to simplify some tasks, but also to give each widget a type so we can write some generic methods, these being:
+
+* `get_value` and `set_value` to retrieve the main value for selection
+* `get_items` and `set_items` to get/set the items to select from
+* `change_slot` to connect a slot to the most typical event.

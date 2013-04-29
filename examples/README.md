@@ -9,7 +9,7 @@ Examples for the `PySide` package
   
 * `events.jl`  Simple example of defining a new class so that we can implement event handlers, as opposed to just signal handlers.
 
-* `data-frame.jl` implements a model for viewing data frames. Can show large data frames without too much lag.
+* `data-frame.jl` Shows `DataFrameModel` for a simple to create model for large data sets.
 
 * `workspace.jl` simple workspace browser.
 
@@ -17,5 +17,9 @@ Examples for the `PySide` package
 
 * `svg.jl` simple use showing `Gadfly` graphic in svg widget
 
+* `simple-plotting.jl` shows how a QGraphicsScene can be used for simple plotting
 
+* `menu.jl` shows how to work with menus
+
+* `timer.jl` shows the basic use of `QTimer`, as an alternate to `Base.TimeoutAsyncWork`
 

@@ -51,7 +51,7 @@ init()
 include("utils.jl")
 include("qtutils.jl")
 include("qtextras.jl")
-include("data-frame-model.jl")  ##  loads in DataFrames, so slow...
+include("data-frame-model.jl")  ##  requires DataFrames, so slow to load...
 
 export Qt, QtCore, QtSvg, QtWebkit
 export qconnect, qemit, qcall, qt_enum
@@ -65,7 +65,9 @@ export Icon, Pixmap, Label, PushButton, Button,
        Slider, SpinBox,
        LineEdit, TextEdit,   
        CheckBox, RadioButton, RadioGroup,
-       ComboBox
+       ComboBox,
+       Action, ActionGroup, MenuBar, Menu,
+       GraphicsScene, GraphicsView
 
 ## models
 export StandardItemModel, DataFrameModel
@@ -93,6 +95,7 @@ export windowTitle, setWindowTitle,
        setIcon, setPixmap, load,       
        setLayout,      
        addWidget, addLayout, addTab, addRow, insertRow, setWidget,
+       addAction, addMenu, addSeparator,
        setCentralWidget,
        setOrientation
 

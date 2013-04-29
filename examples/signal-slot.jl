@@ -5,21 +5,21 @@ using PySide
 
 
 ## test it with a Qt example
-w = Qt.QWidget()
-w[:setWindowTitle]("Example")
+w = Widget()
+setWindowTitle(w, "Example")
 
 
-lcd = Qt.QLCDNumber(w)
-sld = Qt.QSlider(w)
-btn = Qt.QPushButton(w)
-btn[:setText]("click me")
+lcd = Qt.QLCDNumber(w.w)
+sld = Slider(w)
+btn = Button(w)
+setText(btn, "click me")
 
 
-vbox = Qt.QVBoxLayout()
-map(u -> vbox[:addWidget](u), (lcd, sld, btn))
+vbox = VBoxLayout(w)
+map(u -> addWidget(vbox, u), (lcd, sld, btn))
 
 
-w[:setLayout](vbox)
+setLayout(w, vbox)
 
 
 ## connect valueChanged signal of sld with display slot of lcd

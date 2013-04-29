@@ -41,7 +41,7 @@ setText(btn, "Click me")
 push!(lyt, btn)
 
 qconnect(btn, :clicked) do
-  PySide.MessageBox(btn, "Hi there", :Information)
+  MessageBox(btn, "Hi there", :Information)
 end
 
 raise(w)

@@ -2,7 +2,7 @@
 ## this follows the interface of RStudio's manipulate, which is likely following that of
 ## Mathematica's
 
-using Winston
+using Winston ## Winston *must* load before PySide, this is flaky
 using PySide
 
 ## We render output into a label. Here are some different renderers...

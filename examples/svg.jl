@@ -4,20 +4,15 @@
 using PySide
 using Gadfly, Compose
 
-w = Qt.QWidget()
-lyt = Qt.QVBoxLayout(w)
-w[:setLayout](lyt)
+w = Widget()
+lyt = VBoxLayout(w)
+setLayout(w, lyt)
 
-sv = QtSvg.QSvgWidget(w)
-lyt[:addWidget](sv)
+sv = QtSvg.QSvgWidget(w.w)
+addWidget(lyt, sv)
 
-sl = Qt.QSlider(qt_enum("Horizontal"), w)
-lyt[:addWidget](sl)
-
-rng = 2:10
-sl[:setMinimum](min(rng))
-sl[:setMaximum](max(rng))
-sl[:setValue](min(rng))
+sl = Slider(w, "Horizontal", 2:10)
+push!(lyt, sl)
 
 function draw_plot(n)
     p = plot(sin, 0, n * pi)
