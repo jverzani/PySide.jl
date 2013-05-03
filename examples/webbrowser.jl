@@ -54,7 +54,7 @@ end
  ## using QtWebKit to make a simple interface
 using Mustache, GoogleCharts, JSON
 using PySide
-reload(Pkg.dir("PySide", "examples", "evaluate.jl"))
+reload(Pkg.dir("PySide", "examples", "Evaluate.jl"))
 using Evaluate
 using SG
 
