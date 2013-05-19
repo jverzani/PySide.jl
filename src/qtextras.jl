@@ -48,14 +48,14 @@ type Pixmap     <: QtWidget w::PyObject;  Pixmap(parent)     = new(Qt.QPixmap(pr
 
 ## inovke a method with args
 ## widget[:method](args)
-qinvoke(widget::AWidget, method::Symbol, args...) = project(widget)[method](map(project, args)...)
+qinvoke(widget::AWidget, method::Symbol, args...; kargs...) = project(widget)[method](map(project, args)..., kargs...)
 ## invoke ala widget[:meth1]()[:meth2]()...[:methn](args...)
-function qinvoke(widget::AWidget, methods::Vector{Symbol}, args...)
+function qinvoke(widget::AWidget, methods::Vector{Symbol}, args...; kargs...)
     f(widget, method) = widget[method]()
     if length(methods) > 1
-        qinvoke(reduce(f, widget, methods[1:(end-1)]), methods[end], args...)
+        qinvoke(reduce(f, widget, methods[1:(end-1)]), methods[end], args..., kargs...)
     else
-        qinvoke(widget, methods[1], args...)
+        qinvoke(widget, methods[1], args..., kargs...)
     end
 end
 
@@ -78,6 +78,15 @@ get_items(object::QtWidget) = XXX()
 set_items(object::QtWidget, items) = XXX()
 change_slot(object::QtWidget, slot::Slot) = XXX() ## we pass in a slot that expect the value to be passed (value) -> stuff or some PyObject
 
+
+## size
+get_width(object::QtWidget) = qinvoke(object, [:size, :width])
+get_height(object::QtWidget) = qinvoke(object, [:size, :height])
+get_size(object::QtWidget) = [get_width(object), get_size(object)]
+set_width(object::QtWidget, value::Int) = XXX()
+set_height(object::QtWidget, value::Int) = XXX()
+set_size(object::QtWidget, width::Int, height::Int) = qinvoke(object, :resize, width, height)
+set_size(object::QtWidget, size::Vector{Int}) = qinvoke(object, :resize, size[1], size[2])
     
                
     

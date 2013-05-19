@@ -7,7 +7,7 @@ module PySide
 ## initialize
 using PyCall
 using Mustache
-using DataFrames
+##XXXusing DataFrames
 
 ## 
 @pyimport PySide.QtGui    as Qt
@@ -51,7 +51,8 @@ init()
 include("utils.jl")
 include("qtutils.jl")
 include("qtextras.jl")
-include("data-frame-model.jl")  ##  requires DataFrames, so slow to load...
+##include("data-frame-model.jl")  ##  requires DataFrames, so slow to load...
+include("pyqtgraph.jl")  
 
 export Qt, QtCore, QtSvg, QtWebkit
 export qconnect, qemit, qcall, qt_enum
@@ -59,6 +60,7 @@ export qexec
 export qnew_class, qnew_class_instance, qset_method
 export qinvoke
 export get_value, set_value, get_items, set_items, change_slot
+export get_width, get_height, get_size, set_size
 
 ## widgets/controls
 export Icon, Pixmap, Label, PushButton, Button, 

@@ -2,34 +2,44 @@
 ## download source from http://www.pyqtgraph.org/
 ## installed globally with sudo python setup.py install
 
-## From ScatterPlot.py example
+## Mostly From ScatterPlot.py example
 
-using PyCall
-@pyimport pyqtgraph as pg
-@pyimport numpy as np
 using PySide
+using PySide.PyQtGraph
+
+w = Widget()
+lyt = VBoxLayout(w)
+setLayout(w, lyt)
+
+## Graphics Layout Widget make grid of plot devices
+win = GraphicsLayoutWidget(w)
+addWidget(lyt, win)
+set_size(w, 800, 600)
+
+raise(w)
 
 
+w0 = addPlot(win)
+nextRow(win)
 
-win = Widget()
-setWindowTitle(win, "A graphics window")
+w1 = addPlot(win)
 
-lyt = VBoxLayout(win)
-setLayout(win, lyt)
-
-# no qinvoke here with pg, np so we use the [:meth] style for non-pyside widgets
-view = pg[:GraphicsLayoutWidget](win.w) 
-push!(lyt, view)
-
-w1 = view[:addPlot]()
-w2 = view[:addViewBox]()
+## add an API for this?
+w2 = addViewBox(win)
 w2[:setAspectLocked](true)
-view[:nextRow]()
-w3 = view[:addPlot]()
-w4 = view[:addPlot]()
+
+nextRow(win)
+
+w3 = addPlot(win)
+w4 = addPlot(win)
 
 raise(win)
 ## There are a few different ways we can draw scatter plots; each is optimized for different types of data:
+## 0) The easiest way, using addPoints addtion to GraphicsPlot objects
+x = 1:10; y = rand(10)
+w0.addPoints(x, y)
+w0.addLine(x=0, y=1)
+
 
 
 ## 1) All spots identical and transform-invariant (top-left plot). 
@@ -37,12 +47,9 @@ raise(win)
 ## image and just drawing that image repeatedly.
 
 n = 300
-s1 = pg[:ScatterPlotItem](size=10, pen=pg[:mkPen](nothing), brush=pg[:mkBrush](255, 255,255,120))
-
-pos = np[:random][:normal](size=(2,n), scale=1e-5) # from numpy
-spots = [{"pos" => pos[:,i], "data"=>1} for i in 1:n ]  
-    s1[:addPoints](spots)
-    w1[:addItem](s1)
+x = randn(n); y = randn(n)
+s1 = ScatterPlotItem(x, y, size=10, pen=nothing, brush=(255, 255,255,120))
+w1.addItem(s1)
 
 ## Make all plots clickable
 lastClicked = nothing
@@ -55,6 +62,13 @@ function clicked(plot, points)
     map(u -> u[:setPen]("b", width=2), points)
     lastClicked = points
 end
+
+function get_lastclicked()
+    x = map(i -> qinvoke(i, [:pos, :x]), lastClicked) | float
+    y = map(i -> qinvoke(i, [:pos, :y]), lastClicked) | float
+    [x y]
+end
+
 qconnect(s1, :sigClicked, clicked)
 
   
@@ -62,13 +76,11 @@ qconnect(s1, :sigClicked, clicked)
 ## In this case, drawing is as fast as 1), but there is more startup overhead
 ## and memory usage since each spot generates its own pre-rendered image.
 
-s2 = pg.ScatterPlotItem(size=10, pen=pg.mkPen('w'), pxMode=true)
-pos = np.random[:normal](size=(2,n), scale=1e-5)
-#    spots = [{"pos"=>pos[:,i], "data" => 1, "brush"=>pg.intColor(i, n), "symbol" => i % 5, "size"=> 5 + i/10.} for i in 1:n]
- spots = [{"pos"=>pos[:,i], "data" => 1,  "symbol" => i % 5, "size"=> 5 + i/10.} for i in 1:n]
-s2[:addPoints](spots)
-w2[:addItem](s2)
-        qconnect(s2, :sigClicked, clicked)
+scale = 1e-5
+x = rand(n)*scale; y = rand(n)*scale
+s2 = ScatterPlotItem(x, y, size=[5 + (1:n)/10], pen="w", pxMode=true)
+w2.addItem(s2)
+qconnect(s2, :sigClicked, clicked)
 #s2.sigClicked.connect(clicked)
 
 
@@ -76,10 +88,15 @@ w2[:addItem](s2)
 ## This is the slowest case, since all spots must be completely re-drawn 
 ## every time because their apparent transformation may have changed.
 
-s3 = pg.ScatterPlotItem(pxMode=false)   ## Set pxMode=False to allow spots to transform with the view
-spots3 = [{"pos" => (1e-6*i, 1e-6*j), "size" => 1e-6, "pen" => {"color"=>"w", "width"=>2}, "brush"=> pg.intColor(i*10+j, 100)} for i in 1:10, j in 1:10] | u -> reshape(u, 100)
-s3[:addPoints](spots3)
-w3[:addItem](s3)
+## Set pxMode=False to allow spots to transform with the win
+
+x = [1e-6*i for  i in 1:10, j in 1:10] | u -> reshape(u, 100)
+y = [1e-6*j for  i in 1:10, j  in 1:10] | u -> reshape(u, 100)
+brush = [PySide.PyQtGraph.pg.intColor(i*10+j, 100) for i in 1:10, j in 1:10] | u -> reshape(u, 100)
+
+s3 = ScatterPlotItem(x, y, pxMode=false, size=1e-6, pen={:color => "w", :width=>2}, brush=brush)
+
+w3.addItem(s3)
 qconnect(s3, :sigClicked,clicked)
 
 
@@ -88,11 +105,8 @@ qconnect(s3, :sigClicked,clicked)
 ## Test performance of large scatterplots
 ## This gets slow. Could not call as in exmaple
      ## addPoints(x=pos[0], y=pos[1])
-n = 10000
-s4 = pg.ScatterPlotItem(size=10, pen=pg.mkPen(nothing), brush=pg.mkBrush(255, 255, 255, 20))
-     pos = np.random[:normal](size=(2,n), scale=1e-9)
-  spots4 = [{"pos" => pos[:,i], "data"=>1} for i in 1:n ]     
-s4[:addPoints](spots4)
-w4[:addItem](s4)
+n = 10^3                         # 1e4 is slow to respond
+s4 = ScatterPlotItem(randn(n), randn(n), data=string(1:n), size=10, pen=nothing, brush=(255, 255, 255, 20))
+w4.addItem(s4)
 qconnect(s4, :sigClicked, clicked)
 
