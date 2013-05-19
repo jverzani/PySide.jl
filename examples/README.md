@@ -38,20 +38,51 @@ Examples for the `PySide` package
 * `simple-plotting.jl` shows how a QGraphicsScene can be used for
   simple plotting
 
-* `pyqtgraph.jl` creates `plot` function to use for graphing via
-  `pyqtgraph` (http://www.pyqtgraph.org/). One could graph through
-  `Python` with `matplotlib`, but this gives an alternative where
-  embedding a plot device within a graphical framework is
-  possible. The conversion from the `Python` code into `julia` is
-  almost trivial (many `.meth` converted to `[:meth]`, change single
-  quote to double, Python's `def` to `function`, replace `numpy` stuff
-  with `julia`).
+
+## PyQtGraph
+
+The PyQtGraph package (http://www.pyqtgraph.org/) provides a graphing
+interface to Python through Qt written entirely in Python. This
+package may be utilized by PySide, allowing relatively complex graphs
+to be produced. The `PyQtGraph` module gives a light interface to the access. The following
+examples illustrate a bit of what can be done.
+
 
 * `pyqtgraph-scatterplot.jl` shows the scatterplot demo from
   `pyqtgraph`. 
 
-* `pyqtgraph-plot.jl` shows the plot demo from `pyqtgraph`.  The
+* `pyqtgraph.jl` shows the plot demo from `pyqtgraph`.  The
   figure shows the result:
 
 
 <img src="pyqtgraph-plot-ex.png"></img>
+
+
+Making an embedded graph can be done as follows:
+
+```
+using PySide
+using PySide.PyQtGraph
+
+w = Widget()
+
+## These three lines
+win = GraphicsLayoutWidget(w)	## Grid of plot devices
+p1 = addPlot(win, title="Basic array plotting") ## create a plot device
+p1.plot(randn(100))		## make a line plot
+
+## plotting a function
+f(x) = sin(x^2)
+x = linspace(0, 2pi, 1000)
+p2 = addPlot(win, title="function")
+p2.plot(x, map(f, x))
+
+## simple scatter plot
+p2.clear()
+p2.addPoints(1:10, rand(10))
+
+lyt = VBoxLayout(w)
+setLayout(w, lyt)
+addWidget(lyt, win)
+set_size(w, 800, 600)
+```

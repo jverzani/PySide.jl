@@ -4,7 +4,7 @@
 module PyQtGraph
 
 using PyCall
-@pyimport pyqtgraph as pg
+@pyimport pyqtgraph
 @pyimport numpy as np
 using PySide
 import PySide
@@ -13,6 +13,7 @@ import PySide
 export GraphicsWindow, GraphicsLayoutWidget, PlotWidget, ScatterPlotWidget
 export ScatterPlotItem
 export plot, addPlot, addViewBox, nextRow, removeItem
+export pyqtgraph
 
 abstract GraphicsContainer <: PySide.QtWidget
 
@@ -21,13 +22,13 @@ getindex(x::GraphicsContainer, i::Symbol) = x.w[i]
 
 type GraphicsWindow <: GraphicsContainer
     w::PyObject
-    GraphicsWindow(args...) = new(pg.GraphicsWindow(args...))
+    GraphicsWindow(args...) = new(pyqtgraph.GraphicsWindow(args...))
 end
 
 # Used for laying out GraphicsWidgets in a grid.
 type GraphicsLayoutWidget <: GraphicsContainer
     w::PyObject
-    GraphicsLayoutWidget(parent) = new(pg.GraphicsLayoutWidget(PySide.project(parent)))
+    GraphicsLayoutWidget(parent) = new(pyqtgraph.GraphicsLayoutWidget(PySide.project(parent)))
 end
 
 
@@ -81,8 +82,8 @@ type GraphicsPlot <: PySide.QtWidget
              brush=nothing,
              symbol=nothing, symbolPen=nothing, symbolSize=nothing, symbolBrush=nothing,
              fillLevel=nothing) =
-          w[:plot](args...,  pen=pg.mkPen(pen), 
-                   brush=pg.mkBrush(brush),
+          w[:plot](args...,  pen=pyqtgraph.mkPen(pen), 
+                   brush=pyqtgraph.mkBrush(brush),
                    symbol=symbol, symbolPen=symbolPen, symbolBrush=symbolBrush,
                    fillLevel=fillLevel)
         ## XXX change name; better defaults
@@ -125,7 +126,7 @@ getindex(x::GraphicsPlot, i::Symbol) = x.w[i]
 
 ## A GraphicsViewItem with a single plot
 ## return (container, device)
-## XXX doesn't workPlotWidget(parent) = GraphicsPlot(pg.PlotWidget(PySide.project(parent))[:getPlotItem]())
+## XXX doesn't workPlotWidget(parent) = GraphicsPlot(pyqtgraph.PlotWidget(PySide.project(parent))[:getPlotItem]())
 function PlotWidget(parent)
     lyt = GraphicsLayoutWidget(parent)
     plot = addPlot(lyt)
@@ -133,7 +134,7 @@ function PlotWidget(parent)
 end
     
 
-ScatterPlotWidget(parent) = GraphicsPlot(pg.ScatterPlotWidget(PySide.project(parent)))
+ScatterPlotWidget(parent) = GraphicsPlot(pyqtgraph.ScatterPlotWidget(PySide.project(parent)))
 
 type ScatterPlotItem <: PySide.QtWidget
     w
@@ -146,7 +147,7 @@ type ScatterPlotItem <: PySide.QtWidget
     setSymbol
     function ScatterPlotItem(args...; pxMode::Bool=true, symbol="o", pen=nothing, brush=nothing, size=10, data=nothing) 
 
-        self = new(pg.ScatterPlotItem(args..., pxMode=pxMode, symbol=symbol, pen=pen, brush=brush, size=size, data=data))
+        self = new(pyqtgraph.ScatterPlotItem(args..., pxMode=pxMode, symbol=symbol, pen=pen, brush=brush, size=size, data=data))
         
         addPoints(args...;kwargs...) = w[:addPoints](args..., kwargs...)
         setBrush(args...;kwargs...) = w[:setBrush](args..., kwargs...)
@@ -181,7 +182,7 @@ end
 # mkPen(cosmetic=False, width=4.5, color='r')
 # mkPen({'color': "FF0", width: 2})
 # mkPen(None)   # (no pen)
-mkPen(args...) = pg.mkPen(args...)
+mkPen(args...) = pyqtgraph.mkPen(args...)
 
 ## Brush: http://www.pyqtgraph.org/documentation/functions.html#pyqtgraph.mkColor
 # ‘c’	one of: r, g, b, c, m, y, k, w
@@ -195,7 +196,7 @@ mkPen(args...) = pg.mkPen(args...)
 # “RRGGBB”	 
 # “RRGGBBAA”	 
 # QColor	QColor instance; makes a copy.
-mkBrush(args...) = pg.mkBrush(args...)
+mkBrush(args...) = pyqtgraph.mkBrush(args...)
 
 
 

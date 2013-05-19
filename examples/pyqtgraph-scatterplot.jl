@@ -92,7 +92,7 @@ qconnect(s2, :sigClicked, clicked)
 
 x = [1e-6*i for  i in 1:10, j in 1:10] | u -> reshape(u, 100)
 y = [1e-6*j for  i in 1:10, j  in 1:10] | u -> reshape(u, 100)
-brush = [PySide.PyQtGraph.pg.intColor(i*10+j, 100) for i in 1:10, j in 1:10] | u -> reshape(u, 100)
+brush = [pyqtgraph.intColor(i*10+j, 100) for i in 1:10, j in 1:10] | u -> reshape(u, 100)
 
 s3 = ScatterPlotItem(x, y, pxMode=false, size=1e-6, pen={:color => "w", :width=>2}, brush=brush)
 

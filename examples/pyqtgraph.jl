@@ -84,7 +84,7 @@ data2 = sin(x2) ./ x2
 p8.plot(data2, pen=(255,255,255,200))
 
 ## no special functions for LinearRegionItem
-lr = PySide.PyQtGraph.pg[:LinearRegionItem]([400,700])
+lr = pyqtgraph[:LinearRegionItem]([400,700])
 lr[:setZValue](-10)
 p8.addItem(lr)
 
