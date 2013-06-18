@@ -75,7 +75,7 @@ nextRow(win)
 p7 = addPlot(win, title="Filled plot, axis disabled")
 y = sin(linspace(0.0, 10, 1000)) + randn(1000)*0.1
 p7.plot(y, fillLevel=-0.3, brush=(50,50,200,100))
-p7.showAxis("bottom", visible=false)
+p7.showAxis("bottom", show=false)
 
 
 

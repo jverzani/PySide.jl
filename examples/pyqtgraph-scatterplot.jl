@@ -18,7 +18,7 @@ set_size(w, 800, 600)
 
 raise(w)
 
-
+## Here we create plot objects and lay them out first:
 w0 = addPlot(win)
 nextRow(win)
 
@@ -34,6 +34,9 @@ w3 = addPlot(win)
 w4 = addPlot(win)
 
 raise(win)
+
+## This follows the `pyqtgraph` example that this example is taken from:
+
 ## There are a few different ways we can draw scatter plots; each is optimized for different types of data:
 ## 0) The easiest way, using addPoints addtion to GraphicsPlot objects
 x = 1:10; y = rand(10)
@@ -64,8 +67,8 @@ function clicked(plot, points)
 end
 
 function get_lastclicked()
-    x = map(i -> qinvoke(i, [:pos, :x]), lastClicked) | float
-    y = map(i -> qinvoke(i, [:pos, :y]), lastClicked) | float
+    x = map(i -> qinvoke(i, [:pos, :x]), lastClicked) |> float
+    y = map(i -> qinvoke(i, [:pos, :y]), lastClicked) |> float
     [x y]
 end
 
@@ -90,9 +93,9 @@ qconnect(s2, :sigClicked, clicked)
 
 ## Set pxMode=False to allow spots to transform with the win
 
-x = [1e-6*i for  i in 1:10, j in 1:10] | u -> reshape(u, 100)
-y = [1e-6*j for  i in 1:10, j  in 1:10] | u -> reshape(u, 100)
-brush = [pyqtgraph.intColor(i*10+j, 100) for i in 1:10, j in 1:10] | u -> reshape(u, 100)
+x = [1e-6*i for  i in 1:10, j in 1:10] |> u -> reshape(u, 100)
+y = [1e-6*j for  i in 1:10, j  in 1:10] |> u -> reshape(u, 100)
+brush = [pyqtgraph.intColor(i*10+j, 100) for i in 1:10, j in 1:10] |> u -> reshape(u, 100)
 
 s3 = ScatterPlotItem(x, y, pxMode=false, size=1e-6, pen={:color => "w", :width=>2}, brush=brush)
 

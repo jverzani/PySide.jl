@@ -20,7 +20,10 @@ This package doesn't provide much beyond:
 * some examples illustrating the basic usage.
 
 
-### A basic "hello world" example with a parent container, layout, button, callback and dialog illustrated:
+### A basic "hello world" example
+
+This example illustrates how to use the `PyCall` interface to produce a basic GUI with a
+parent container, layout, button, callback and dialog:
 
 ```
 using PySide			# imports Qt, QtCore (Qt is QtGui)
@@ -45,10 +48,12 @@ end
 raise(w)			# show and raise widget
 ```
 
+`PyCall` objects have many methods accessible through `.`, but not all. The `[:symbol'` notation can access the remainder. This allows access to most of the functionality of `PySide`.
+
 
 ### A (slightly) more convenient interface
 
-We also provide a slightly more convenient interface for common tasks. The hello world example could be:
+We also provide a slightly more convenient interface for common tasks. For example, the "hello world" example could be written as:
 
 ```
 
@@ -88,3 +93,6 @@ each widget a type so we can write some generic methods, these being:
 * `get_items` and `set_items` to get/set the items to select from
 
 * `change_slot` to connect a slot to the most typical event.
+
+
+There are other examples in the _examples_ directory.

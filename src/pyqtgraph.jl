@@ -1,6 +1,5 @@
 ## module for pyqtgraph
-## More tedious than needed as passing kwargs... through isn't working and don't know why
-## must specify names so need f(key=value) = w[:meth](..., key=key) tediousness
+## More tedious than needed as we list some keywords, rather than pass in through kwargs...
 module PyQtGraph
 
 using PyCall
@@ -92,12 +91,12 @@ type GraphicsPlot <: PySide.QtWidget
         addItem(item, args...; kwargs...) =    qinvoke(w,:addItem, item, args...; kwargs...)
         removeItem(item, args...; kwargs...) = qinvoke(w,:removeItem, item, args...; kwargs...)
         addLegend(;size=nothing, offset=(30,30)) = qinvoke(w, :addLegend, size=size, offset=offset)
-        addLine(;x=nothing, y=nothing, z=nothing, kwargs...) = qinvoke(w,:addLine, x=x,y=y,z=z; kwargs...)
+        addLine(;x=nothing, y=nothing, z=nothing, kwargs...) = qinvoke(w,:addLine; x=x,y=y,z=z, kwargs...)
         showGrid(; x=true, y=true, alpha=nothing)  = qinvoke(w, :showGrid, x=x, y=y, alpha=alpha)
-        showAxis(where::String, show::Bool=true; kwargs...) = qinvoke(w, :showAxis, where, show; kwargs...)
+        showAxis(where::String, show::Bool=true; kwargs...) = qinvoke(w, :showAxis, where; show=show, kwargs...)
         hideAxis(axis::String) = w[:hideAxis](axis)
-        setLabel(axis::String, text=nothing, units=nothing; kwargs...) = qinvoke(w, :setLabel, axis, text=text, units=units; kwargs...)
-        setLogMode(args...; x=true, y=true, kwargs...) = qinvoke(w, :setLogMode, args..., x=x, y=y; kwargs...)
+        setLabel(axis::String, text=nothing, units=nothing; kwargs...) = qinvoke(w, :setLabel, axis; text=text, units=units, kwargs...)
+        setLogMode(args...; x=true, y=true, kwargs...) = qinvoke(w, :setLogMode, args...; x=x, y=y, kwargs...)
         enableAutoRange(args...; kwargs...) = qinvoke(w, :enableAutoRange, args...; kwargs...)
         setXRange(args...; kwargs...) = qinvoke(w, :setXRange, args...; kwargs...)
         setYRange(args...; kwargs...) = qinvoke(w, :setYRange, args...; kwargs...)
