@@ -1,3 +1,4 @@
+## silly module to emulate D3 syntax. 
 module DThree
 
  export I, @I_str, D3

@@ -7,7 +7,7 @@ module PySide
 ## initialize
 using PyCall
 using Mustache
-##XXXusing DataFrames
+using DataFrames
 
 ## 
 @pyimport PySide.QtGui    as Qt
@@ -21,37 +21,13 @@ import Base.getindex, Base.setindex!, Base.push!, Base.pop!, Base.delete!
 
 
 
-## from gtk_doevent, tk_doevent pattern
-global initialized = false
-function init()
-    global initialized
-    if initialized
-        println("Already initialized PySide")
-        return()
-    end
-
-    initialized = true
-    app = Qt.QApplication(sys.argv)
-
-    qt_doevent(::Int32) = qt_doevent()
-    function qt_doevent()
-        app[:processEvents]()
-    end
-    
-    global timeout
-    timeout = Base.TimeoutAsyncWork(qt_doevent)
-    Base.start_timer(timeout,int64(20),int64(20))
-end
-
-
-init()
 
 
 
 include("utils.jl")
 include("qtutils.jl")
 include("qtextras.jl")
-##include("data-frame-model.jl")  ##  requires DataFrames, so slow to load...
+include("data-frame-model.jl")  ##  requires DataFrames, so slow to load...
 include("pyqtgraph.jl")  
 
 export Qt, QtCore, QtSvg, QtWebkit
@@ -112,6 +88,29 @@ export setFocus, raise
 
 
 
+## from gtk_doevent, tk_doevent pattern
+global initialized = false
+function init()
+    global initialized
+    if initialized
+        println("Already initialized PySide")
+        return()
+    end
+
+    initialized = true
+    app = Qt.QApplication(sys.argv)
+
+    qt_doevent(::Int32) = qt_doevent()
+    function qt_doevent()
+        app[:processEvents]()
+    end
+    
+    global timeout
+    timeout = Base.TimeoutAsyncWork(qt_doevent)
+    Base.start_timer(timeout,int64(20),int64(20))
+end
+
+init()
 
 
 

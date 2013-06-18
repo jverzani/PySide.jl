@@ -25,7 +25,7 @@ setLayout(w, vbox)
 ## connect valueChanged signal of sld with display slot of lcd
 qconnect(sld, :valueChanged, lcd[:display])
 qconnect(btn, :clicked) do
-  println("clicked button")
+  println("clicked button. Value is:", get_value(sld))
 end
 
 

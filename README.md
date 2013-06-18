@@ -80,8 +80,11 @@ args...)`. Alternatively, one can call as
 convenience method is not created.
 
 
-The main point of this is to simplify some tasks, but also to give each widget a type so we can write some generic methods, these being:
+The main point of this is to simplify some tasks, but also to give
+each widget a type so we can write some generic methods, these being:
 
 * `get_value` and `set_value` to retrieve the main value for selection
+
 * `get_items` and `set_items` to get/set the items to select from
+
 * `change_slot` to connect a slot to the most typical event.

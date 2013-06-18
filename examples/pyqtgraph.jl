@@ -1,4 +1,6 @@
 ## using the PyQtGraph submodule
+## Examples from pyqtgraphs plotting.py
+## translated into julia style
 
 using PySide
 using PySide.PyQtGraph
@@ -50,21 +52,21 @@ p5.setLogMode(x=true, y=false)
 p6 = addPlot(win, title="Updating plot")
 
 curve = p6.plot(pen="y")
-data = randn(10, 10000)
+data = randn(10000, 10)
 ptr = 0
 function update()
     global curve, data, ptr, p6
-    curve[:setData]([1:10_000 data[1 + ptr%10,:]']) # had to fix this
+    qinvoke(curve, :setData, 1:10_000, data[:, 1 + ptr]) # had to fix this
     if ptr == 0
         p6.enableAutoRange("xy", false)  ## stop auto-scaling after the first data set is plotted
     end
-    ptr += 1
+    ptr = (ptr + 1) % 10
 end
 
 
 timer = QtCore.QTimer()
 qconnect(timer, :timeout, update)
-timer[:start](50)
+qinvoke(timer, :start, 50)
 
 
 nextRow(win)
@@ -85,21 +87,22 @@ p8.plot(data2, pen=(255,255,255,200))
 
 ## no special functions for LinearRegionItem
 lr = pyqtgraph[:LinearRegionItem]([400,700])
-lr[:setZValue](-10)
+qinvoke(lr, :setZValue, -10)
 p8.addItem(lr)
 
-## This isn't working right now.
-# p9 = addPlot(win, title="zoom")
-# p9.plot(data2)
+p9 = addPlot(win, title="zoom")
+p9.plot(data2)
 
-# function updatePlot()
-#     p9.setXRange(lr[:getRegion](), padding=0)
-# end
-# function updateRegion()
-#     lr[:setRegion](p9[:getViewBox]()[:viewRange]()[0 + 1])
-# end
-# qconnect(lr, :sigRegionChanged, updatePlot)
-# qconnect(p9, :sigXRangeChanged, updateRegion)
-#updatePlot()
+function updatePlot()
+    p9.setXRange(lr[:getRegion]()..., padding=0)
+end
+function updateRegion()
+    view_range = qinvoke(p9, [:getViewBox, :viewRange]) # 2x2 array
+    x_range = Int[view_range[1,j] for j in 1:2]         # a vector, not just view_range[1,:]'
+    qinvoke(lr, :setRegion, x_range)
+end
+qconnect(lr, :sigRegionChanged, updatePlot)
+qconnect(p9, :sigXRangeChanged, updateRegion)
+updatePlot()
 
-#raise(w)
+ #raise(w)

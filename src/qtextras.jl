@@ -48,14 +48,16 @@ type Pixmap     <: QtWidget w::PyObject;  Pixmap(parent)     = new(Qt.QPixmap(pr
 
 ## inovke a method with args
 ## widget[:method](args)
-qinvoke(widget::AWidget, method::Symbol, args...; kargs...) = project(widget)[method](map(project, args)..., kargs...)
+function qinvoke(widget::AWidget, method::Symbol, args...; kwargs...) 
+    project(widget)[method](map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
+end
 ## invoke ala widget[:meth1]()[:meth2]()...[:methn](args...)
-function qinvoke(widget::AWidget, methods::Vector{Symbol}, args...; kargs...)
+function qinvoke(widget::AWidget, methods::Vector{Symbol}, args...; kwargs...)
     f(widget, method) = widget[method]()
     if length(methods) > 1
-        qinvoke(reduce(f, widget, methods[1:(end-1)]), methods[end], args..., kargs...)
+        qinvoke(reduce(f, widget, methods[1:(end-1)]), methods[end], args..., kwargs...)
     else
-        qinvoke(widget, methods[1], args..., kargs...)
+        qinvoke(widget, methods[1], args..., kwargs...)
     end
 end
 
@@ -76,19 +78,32 @@ get_value(object::QtWidget) = XXX()
 set_value(object::QtWidget, value) = XXX()
 get_items(object::QtWidget) = XXX()
 set_items(object::QtWidget, items) = XXX()
-change_slot(object::QtWidget, slot::Slot) = XXX() ## we pass in a slot that expect the value to be passed (value) -> stuff or some PyObject
+change_slot(object::QtWidget, slot::Slot) = XXX() ## we pass in a slot that expects the value to be passed (value) -> stuff or some PyObject
 
 
 ## size
-get_width(object::QtWidget) = qinvoke(object, [:size, :width])
-get_height(object::QtWidget) = qinvoke(object, [:size, :height])
+width(object::QtWidget) = qinvoke(object, [:size, :width])
+height(object::QtWidget) = qinvoke(object, [:size, :height])
 get_size(object::QtWidget) = [get_width(object), get_size(object)]
-set_width(object::QtWidget, value::Int) = XXX()
-set_height(object::QtWidget, value::Int) = XXX()
+#set_width(object::QtWidget, value::Int) = XXX()
+#set_height(object::QtWidget, value::Int) = XXX()
 set_size(object::QtWidget, width::Int, height::Int) = qinvoke(object, :resize, width, height)
 set_size(object::QtWidget, size::Vector{Int}) = qinvoke(object, :resize, size[1], size[2])
     
-               
+    
+get_enabled(object::QtWidget) = XXX()
+set_enabled(object::QtWidget, value::Bool) = XXX()
+
+get_editable(object::QtWidget) = XXX()
+set_editable(object::QtWidget, value::Bool) = XXX()
+
+get_visible(object::QtWidget) = XXX()
+set_visible(object::QtWidget, value::Bool) = XXX()
+
+focus(object::QtWidget) = setFocus(object)
+##raise(object::QtWidget) = XXX()
+exists(object::QtWidget) = XXX()
+
     
 
 ## does widget exist?
@@ -143,7 +158,7 @@ for nm in (:windowTitle,
            :setWidget      
            )
     meth = string(nm)
-    @eval ($nm)(widget::AWidget, args...) = qinvoke(project(widget), symbol($meth), args...)
+    @eval ($nm)(widget::AWidget, args...; kwargs...) = qinvoke(project(widget), symbol($meth), args...; kwargs...)
 end
 
 ## set focus

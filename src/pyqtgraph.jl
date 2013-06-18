@@ -38,7 +38,7 @@ end
 resize(widget::GraphicsWindow, width::Int, height::Int) = qinvoke(widget, :resize, width, height)
 setWindowTitle(widget::GraphicsWindow, args...) = qinvoke(widget, :setWindowTitle, args...)
 
-plot(widget::GraphicsContainer, args...; kwargs...) = GraphicsPlot(qinvoke(widget, :plot, args..., kwargs...))
+plot(widget::GraphicsContainer, args...; kwargs...) = GraphicsPlot(qinvoke(widget, :plot, args...; kwargs...))
 addPlot(widget::GraphicsContainer; title="") = GraphicsPlot(PySide.project(widget)[:addPlot](title=title))
 addViewBox(widget::GraphicsContainer) = GraphicsPlot(qinvoke(widget, :addViewBox))
 ## layout
@@ -89,18 +89,18 @@ type GraphicsPlot <: PySide.QtWidget
         ## XXX change name; better defaults
         addPoints(args...;  symbol="o", symbolSize=5,   symbolBrush=(255,255,255, 50), pen=nothing, symbolPen=nothing) =
           plot(args...; symbol=symbol, symbolSize=symbolSize, symbolBrush=symbolBrush, pen=pen, symbolPen=symbolPen)
-        addItem(item, args...; kwargs...) = w[:addItem](PySide.project(item), args..., kwargs...)
-        removeItem(item, args...; kwargs...) = w[:removeItem](PySide.project(item), args..., kwargs...)
-        addLegend(;size=nothing, offset=(30,30)) = w[:addLegend](size=size, offset=offset)
-        addLine(;x=nothing, y=nothing, z=nothing, kwargs...) = w[:addLine](x=x,y=y,z=z, kwargs...)
-        showGrid(; x=true, y=true, alpha=nothing)  = w[:showGrid](x=x, y=y, alpha=alpha)
-        showAxis(where::String; visible::Bool=true, kwargs...) = w[:showAxis](where, visible, kwargs...)
+        addItem(item, args...; kwargs...) =    qinvoke(w,:addItem, item, args...; kwargs...)
+        removeItem(item, args...; kwargs...) = qinvoke(w,:removeItem, item, args...; kwargs...)
+        addLegend(;size=nothing, offset=(30,30)) = qinvoke(w, :addLegend, size=size, offset=offset)
+        addLine(;x=nothing, y=nothing, z=nothing, kwargs...) = qinvoke(w,:addLine, x=x,y=y,z=z; kwargs...)
+        showGrid(; x=true, y=true, alpha=nothing)  = qinvoke(w, :showGrid, x=x, y=y, alpha=alpha)
+        showAxis(where::String, show::Bool=true; kwargs...) = qinvoke(w, :showAxis, where, show; kwargs...)
         hideAxis(axis::String) = w[:hideAxis](axis)
-        setLabel(axis::String; text=nothing, units=nothing, kwargs...) = w[:setLabel](axis, text=text, units=units, kwargs...)
-        setLogMode(args...; x=true, y=true, kwargs...) = w[:setLogMode](args..., x=x, y=y, kwargs...)
-        enableAutoRange(args...; kwargs...) = w[:enableAutoRange](args..., kwargs...)
-        setXRange(args...; kwargs...) = w[:setXRange](args..., kwargs...)
-        setYRange(args...; kwargs...) = w[:setYRange](args..., kwargs...)
+        setLabel(axis::String, text=nothing, units=nothing; kwargs...) = qinvoke(w, :setLabel, axis, text=text, units=units; kwargs...)
+        setLogMode(args...; x=true, y=true, kwargs...) = qinvoke(w, :setLogMode, args..., x=x, y=y; kwargs...)
+        enableAutoRange(args...; kwargs...) = qinvoke(w, :enableAutoRange, args...; kwargs...)
+        setXRange(args...; kwargs...) = qinvoke(w, :setXRange, args...; kwargs...)
+        setYRange(args...; kwargs...) = qinvoke(w, :setYRange, args...; kwargs...)
 
         self.plot = plot
         self.addPoints = addPoints
@@ -149,13 +149,13 @@ type ScatterPlotItem <: PySide.QtWidget
 
         self = new(pyqtgraph.ScatterPlotItem(args..., pxMode=pxMode, symbol=symbol, pen=pen, brush=brush, size=size, data=data))
         
-        addPoints(args...;kwargs...) = w[:addPoints](args..., kwargs...)
-        setBrush(args...;kwargs...) = w[:setBrush](args..., kwargs...)
-        setData(args...;kwargs...) = w[:setData](args..., kwargs...)
-        setPen(args...;kwargs...) = w[:setPen](args..., kwargs...)
-        setSize(size; update=true, dataSet=nothing, mask=nothing) = w[:setSize](size, update=update, dataSet=dataSet, mask=mask)
-        setSymbol(symbol; update=true, dataSet=nothing, mask=nothing) = w[:setSymbol](symbol, update=update, dataSet=dataSet, mask=mask)
-        self.clear = () -> w[:clear]()
+        addPoints(args...;kwargs...) = qinvoke(w, :addPoints, args...; kwargs...)
+        setBrush(args...;kwargs...) = qinvoke(w, :setBrush, args...; kwargs...)
+        setData(args...;kwargs...) = qinvoke(w, :setData, args...; kwargs...)
+        setPen(args...;kwargs...) = qinvoke(w, :setPen, args...; kwargs...)
+        setSize(size; update=true, dataSet=nothing, mask=nothing) = qinvoke(w, :setSize, size, update=update, dataSet=dataSet, mask=mask)
+        setSymbol(symbol; update=true, dataSet=nothing, mask=nothing) = qinvoke(w, :setSymbol, symbol, update=update, dataSet=dataSet, mask=mask)
+        self.clear = () -> qinvoke(w, :clear)
         self.addPoints = addPoints
         self.setBrush = setBrush
         self.setData = setData
