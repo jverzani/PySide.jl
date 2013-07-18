@@ -13,7 +13,7 @@ objects into `julia` objects.)
 
 This package doesn't provide much beyond:
 
-* a means to integrate the `Qt` event loop within a `julia` session, shamelessly lifted from the `Tk` and `Gtk` packages
+* configures `PyCall`'s event loop integration
 
 * a few convenience functions
 
