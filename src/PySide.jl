@@ -84,34 +84,10 @@ export setFocus, raise
 
 
 
-
-
-
-
-## from gtk_doevent, tk_doevent pattern
-global initialized = false
-function init()
-    global initialized
-    if initialized
-        println("Already initialized PySide")
-        return()
-    end
-
-    initialized = true
-    app = Qt.QApplication(sys.argv)
-
-    qt_doevent(::Int32) = qt_doevent()
-    function qt_doevent()
-        app[:processEvents]()
-    end
-    
-    global timeout
-    timeout = Base.TimeoutAsyncWork(qt_doevent)
-    Base.start_timer(timeout,int64(20),int64(20))
-end
-
-init()
-
+## use PyCall's start gui
+pygui(:qt)
+PyCall.eventloops[:qt] = PyCall.qt_eventloop("PySide", 50e-3)
+app = Qt.QApplication(sys.argv)
 
 
 

@@ -38,7 +38,7 @@ addSeparator(submenu)
 ## add checkbutton
 cb = Action("checkable", w)
 cb[:setCheckable](true)
-change_slot(cb, () -> println("checkable", cb[:isChecked]() ? "is checked" : "is not checked"))
+change_slot(cb, () -> println("checkable ", cb[:isChecked]() ? "is checked" : "is not checked"))
 addAction(submenu, cb)
 
 
