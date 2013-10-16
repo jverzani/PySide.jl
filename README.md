@@ -19,6 +19,11 @@ This package doesn't provide much beyond:
 
 * some examples illustrating the basic usage.
 
+### Installation
+
+- Download and install [PySide](http://qt-project.org/wiki/Get-PySide)
+- For some examples, install SciPy (Ubuntu: `apt-get install python-scipy`)
+- For some examples, download and install [PyQtGraph](http://www.pyqtgraph.org/)
 
 ### A basic "hello world" example
 
