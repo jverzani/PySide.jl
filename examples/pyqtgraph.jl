@@ -4,6 +4,8 @@
 
 using PySide
 using PySide.PyQtGraph
+using PyCall
+@pyimport pyqtgraph
 
 w = Widget()
 lyt = VBoxLayout(w)
@@ -64,7 +66,7 @@ function update()
 end
 
 
-timer = QtCore.QTimer()
+timer = QtCore[:QTimer]()
 qconnect(timer, :timeout, update)
 qinvoke(timer, :start, 50)
 
@@ -86,7 +88,7 @@ data2 = sin(x2) ./ x2
 p8.plot(data2, pen=(255,255,255,200))
 
 ## no special functions for LinearRegionItem
-lr = pyqtgraph[:LinearRegionItem]([400,700])
+lr = pyqtgraph.(:LinearRegionItem)([400,700])
 qinvoke(lr, :setZValue, -10)
 p8.addItem(lr)
 
@@ -99,10 +101,10 @@ end
 function updateRegion()
     view_range = qinvoke(p9, [:getViewBox, :viewRange]) # 2x2 array
     x_range = Int[view_range[1,j] for j in 1:2]         # a vector, not just view_range[1,:]'
-    qinvoke(lr, :setRegion, x_range)
+    lr[:setRegion](x_range)
 end
 qconnect(lr, :sigRegionChanged, updatePlot)
-qconnect(p9, :sigXRangeChanged, updateRegion)
+#qconnect(p9, :sigXRangeChanged, updateRegion) ## this is giving issues. Find out why.
 updatePlot()
 
  #raise(w)
