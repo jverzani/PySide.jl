@@ -16,7 +16,7 @@ qcall(object::PyObject, member::Symbol, args...) = object[member](args...)
 ## get Qt.Qt.enum as pyobject (http://qt-project.org/doc/qt-4.8/qt.html)
 ## TODO: generelize to others by passing in second argument
 qt_enum(attr::Symbol) = qt_enum(string(attr))
-qt_enum(attr::ASCIIString) = QtCore["Qt"][attr] # want pyobject here
+qt_enum(attr::ASCIIString) = QtCore["Qt"][attr] # want pyobject here, not :Qt
 
 ## combining enums require us to work in python:
 PyCall.pyeval("execfile(x, globals())", x = Pkg.dir("PySide", "tpl", "imports.tpl"))
@@ -51,6 +51,7 @@ end
 
 ## make an instance of the new class
 qnew_class_instance(name::ASCIIString) = PyCall.pyeval("$name()")
+qnew_class_instance(name::ASCIIString, parent) = PyCall.pyeval("$name(x)", x=parent)
 
 ## add a method to the class.
 ## qnew_class("Example", "QtGui.QWidget")
