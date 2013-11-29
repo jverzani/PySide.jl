@@ -46,7 +46,7 @@ qconnect(btn, :clicked) do	# qconnect convenience to connect to a signal
   msg[:setWindowTitle]("A message for you...")
   msg[:setText]("Hello world!")
   msg[:setInformativeText]("Thanks for clicking.")
-  msg[:setIcon](Qt[:QMessageBox]()[:Information])   # how to pick out Qt::QMessageBox::Information enumeration
+  msg[:setIcon](Qt.QMessageBox()[:Information])   # how to pick out Qt::QMessageBox::Information enumeration
   convert(Function, msg[:exec])()       # Sometimes, one must must convert to a function (or call qexec(msg))
 end
 
