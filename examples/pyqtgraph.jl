@@ -3,9 +3,10 @@
 ## translated into julia style
 
 using PySide
-using PySide.PyQtGraph
+reload(Pkg.dir("PySide", "src", "pyqtgraph.jl"))
+using PyQtGraph
 using PyCall
-@pyimport pyqtgraph
+
 
 w = Widget()
 lyt = VBoxLayout(w)
@@ -24,8 +25,8 @@ p1.plot(randn(100))
 
 p2 = addPlot(win, title="Multiple curves")
 p2.plot(randn(100), pen=(255,0,0))
-p2.plot(randn(100) + 5, pen=(0, 255, 0))
-p2.plot(randn(100) + 10, pen=(0,0,255))
+p2.plot(randn(100) .+ 5, pen=(0, 255, 0))
+p2.plot(randn(100) .+ 10, pen=(0,0,255))
 
 
 p3 = addPlot(win, title="Drawing with points")
@@ -39,8 +40,8 @@ p4.showGrid()                   # defaults x=true, y=true
 
 p5 = addPlot(win, title="Scatter plot, axis labels, log scale")
 x = 1e-5 * rand(1000)
-y = x*1000 + 0.005 * randn(1000)
-y -= min(y)-1.0
+y = x*1000 .+ 0.005 * randn(1000)
+y -= minimum(y).-1.0
 mask = x .> 1e-15
 x = x[mask]
 y = y[mask]
@@ -75,7 +76,7 @@ nextRow(win)
 
 
 p7 = addPlot(win, title="Filled plot, axis disabled")
-y = sin(linspace(0.0, 10, 1000)) + randn(1000)*0.1
+y = sin(linspace(0.0, 10, 1000)) .+ randn(1000)*0.1
 p7.plot(y, fillLevel=-0.3, brush=(50,50,200,100))
 p7.showAxis("bottom", show=false)
 

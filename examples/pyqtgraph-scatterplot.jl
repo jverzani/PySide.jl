@@ -5,7 +5,8 @@
 ## Mostly From ScatterPlot.py example
 
 using PySide
-using PySide.PyQtGraph
+reload(Pkg.dir("PySide", "src", "pyqtgraph.jl"))
+using PyQtGraph
 
 w = Widget()
 lyt = VBoxLayout(w)

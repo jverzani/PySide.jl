@@ -6,7 +6,6 @@ using PyCall
 @pyimport pyqtgraph
 @pyimport numpy as np
 using PySide
-import PySide
 
 
 export GraphicsWindow, GraphicsLayoutWidget, PlotWidget, ScatterPlotWidget

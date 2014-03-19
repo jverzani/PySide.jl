@@ -28,7 +28,11 @@ include("utils.jl")
 include("qtutils.jl")
 include("qtextras.jl")
 ##include("data-frame-model.jl")  ##  requires DataFrames, so slow to load...
-include("pyqtgraph.jl")  
+
+## replace this
+##include("pyqtgraph.jl")  
+## call reload(Pkg.dir("PySide", "src", "pyqtgraph.jl"))
+##      using PyQtGraph
 
 export Qt, QtCore, QtSvg, QtWebkit
 export qconnect, qemit, qcall, qt_enum
