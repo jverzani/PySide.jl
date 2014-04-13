@@ -21,7 +21,12 @@ qt_enum(attr::ASCIIString) = QtNamespace[attr] # want pyobject here
 
 
 ## combining enums require us to work in python:
-PyCall.pyeval("execfile(x, globals())", x = Pkg.dir("PySide", "tpl", "imports.tpl"))
+if pyversion < v"3" 
+    PyCall.pyeval("execfile(x, globals())", x = Pkg.dir("PySide", "tpl", "imports.tpl")) 
+else 
+    PyCall.pyeval("exec(open(x, 'rb'), globals())", x = Pkg.dir("PySide", "tpl", "imports.tpl"))
+end
+
 qt_enum(attr::Vector{ASCIIString}; how="|") = PyCall.pyeval(join(map(u -> "QtCore.Qt.$u", attr), " $how "))
 
 ## some converstion
@@ -48,7 +53,11 @@ function qnew_class(name::ASCIIString, parent::ASCIIString; meths=nothing)
     out = Mustache.render(io, newclass_tpl, d)
     println(out)
     close(io)
-    PyCall.pyeval("execfile('$tmp', globals())")
+    if pyversion < v"3" 
+        PyCall.pyeval("execfile('$tmp', globals())") 
+    else
+        PyCall.pyeval("exec(open('$tmp', 'rb'), globals())")
+    end
 end
 
 ## make an instance of the new class

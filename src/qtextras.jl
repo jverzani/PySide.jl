@@ -175,6 +175,7 @@ end
 ## Containers    
     
 ## MainWindow
+##  https://groups.google.com/forum/?fromgroups#!topic/julia-users/-BThHzBiYZs for details on waiting.
 MainWindow() = MainWindow(nothing)
 setCentralWidget(widget::MainWindow, child::AWidget) = qinvoke(widget, :setCentralWidget, child)
 
