@@ -24,7 +24,7 @@ qt_enum(attr::ASCIIString) = QtNamespace[attr] # want pyobject here
 if pyversion < v"3" 
     PyCall.pyeval("execfile(x, globals())", x = Pkg.dir("PySide", "tpl", "imports.tpl")) 
 else 
-    PyCall.pyeval("exec(open(x, 'rb'), globals())", x = Pkg.dir("PySide", "tpl", "imports.tpl"))
+    PyCall.pyeval("exec(open(x, 'rb').read(), globals())", x = Pkg.dir("PySide", "tpl", "imports.tpl"))
 end
 
 qt_enum(attr::Vector{ASCIIString}; how="|") = PyCall.pyeval(join(map(u -> "QtCore.Qt.$u", attr), " $how "))
