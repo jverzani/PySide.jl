@@ -7,7 +7,8 @@ module PySide
 ## initialize
 using PyCall
 using Mustache
-#using DataFrames
+using Requires
+
 
 ## 
 @pyimport PySide.QtGui    as Qt
@@ -27,7 +28,10 @@ import Base.getindex, Base.setindex!, Base.push!, Base.pop!, Base.delete!
 include("utils.jl")
 include("qtutils.jl")
 include("qtextras.jl")
-##include("data-frame-model.jl")  ##  requires DataFrames, so slow to load...
+
+@require DataFrames begin
+    include(Pkg.dir("PySide", "src", "data-frame-model.jl"))
+end
 
 ## replace this
 ##include("pyqtgraph.jl")  

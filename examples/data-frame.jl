@@ -9,20 +9,31 @@ d = DataFrame(x=[randstring(10) for i in 1:10],
               x__BackgroundRole= rep("yellow", 10),
               y = 1:10
               )
-view = TableView()
+
+w = Widget()
+lyt = VBoxLayout(w)
+setLayout(w, lyt)
+
+
+view = TableView(w)
+push!(lyt, view)
+
 m = DataFrameModel(d, view)
 setModel(view, m)
-raise(view)
               
 ## test scaling
 n = 10^5
-d = DataFrame(x = randn(n),
+d1 = DataFrame(x = randn(n),
               y = 1:n)
-        
-view = TableView()
-m = DataFrameModel(d, view, editable=true)
+
+
+view = TableView(w)
+push!(lyt, view)
+
+m = DataFrameModel(d1, view, editable=true)
 setModel(view, m)
-raise(view)
+
+raise(w)
 
              
               

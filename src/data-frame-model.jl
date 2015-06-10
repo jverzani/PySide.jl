@@ -67,9 +67,9 @@ function set_items(m::DataFrameModel, d::DataFrames.DataFrame; editable=false)
     m.d = d
     
     role_re  = r"__[a-zA-Z]+Role$"
-    nms = filter(u -> !ismatch(role_re, u), colnames(d))
+    nms = filter(u -> !ismatch(role_re, string(u)), names(d))
 
-    project(m)[:rowCount] = (index) -> nrow(d)
+    project(m)[:rowCount] = (index) -> size(d)[1]
     project(m)[:columnCount] = (index) -> length(nms)
 
     ## data property
@@ -99,7 +99,7 @@ function set_items(m::DataFrameModel, d::DataFrames.DataFrame; editable=false)
 
         
         ## check the rol
-        cnames = colnames(m.d)
+        cnames = map(string, names(m.d))
         roles = ["DisplayRole", "EditRole", "TextAlignmentRole", "BackgroundRole", "ForegroundRole", "ToolTipRole", "WhatsThisRole"]
         function role_default(r, row, col)
             if r == "DisplayRole"
@@ -122,8 +122,8 @@ function set_items(m::DataFrameModel, d::DataFrames.DataFrame; editable=false)
         end
         for r in roles
             if role == convert(Int, qt_enum(r))
-                role_name = nm * "__" * r
-                out = (contains(cnames, role_name) ? make_role(r, m.d[row, role_name]) : role_default(r, row, nm))
+                role_name = string(nm) * "__" * r
+                out = (any(cnames .== role_name) ? make_role(r, m.d[row, symbol(role_name)]) : role_default(r, row, nm))
                 return(out)
             end
         end
