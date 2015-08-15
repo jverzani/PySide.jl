@@ -241,9 +241,9 @@ addWidget(lyt::GridLayout, widget::AWidget, row::Int, column::Int, alignment::St
 addWidget(lyt::GridLayout, widget::AWidget, row::Int, column::Int, alignment::String) = addWidget(lyt, widget, row, column, "AlignLeft")
 
 ## lyt[i,j:k] = widget interface
-function setindex!(lyt::GridLayout, widget::AWidget, i::Union(Int, Range, Range1), j::Union(Int, Range, Range1)) 
-    if isa(i, Union(Range, Range1)) | isa(j, Union(Range, Range1))
-        addWidget(lyt, widget, min(i), min(j), max(i) - min(i) + 1, max(j) - min(j) + 1)
+function setindex!(lyt::GridLayout, widget::AWidget, i::Union(Int, Range, UnitRange), j::Union(Int, Range, UnitRange)) 
+    if isa(i, Union(Range, UnitRange)) | isa(j, Union(Range, UnitRange))
+        addWidget(lyt, widget, minimum(i), minimum(j), maximum(i) - minimum(i) + 1, maximum(j) - minimum(j) + 1)
     else
         addWidget(lyt, widget, i, j)
     end
@@ -253,9 +253,9 @@ addLayout(lyt::GridLayout, widget::QtLayout, row::Int, column::Int, rowSpan::Int
 addLayout(lyt::GridLayout, widget::QtLayout, row::Int, column::Int, alignment::String) = qinvoke(lyt, :addLayout, widget, row, column, qt_enum(alignment))
 addLayout(lyt::GridLayout, widget::QtLayout, row::Int, column::Int, alignment::String) = addLayout(lyt, widget, row, column, "AlignLeft")
 ## lyt[i,j:k] = lyt interface
-function setindex!(lyt::GridLayout, widget::QtLayout, i::Union(Int, Range, Range1), j::Union(Int, Range, Range1)) 
-    if isa(i, Union(Range, Range1)) | is(j, Union(Range, Range1))
-        addLayout(lyt, widget, min(i), min(j), (max(i) - min(i)) + 1, max(j) - min(j) + 1)
+function setindex!(lyt::GridLayout, widget::QtLayout, i::Union(Int, Range, UnitRange), j::Union(Int, Range, UnitRange)) 
+    if isa(i, Union(Range, UnitRange)) | is(j, Union(Range, UnitRange))
+        addLayout(lyt, widget, minimum(i), minimum(j), (maximum(i) - minimum(i)) + 1, maximum(j) - minimum(j) + 1)
     else
         addLayout(lyt, widget, i, j)
     end
@@ -300,51 +300,49 @@ set_value(widget::Label, value) = setText(widget, value)
 change_slot(widget::Label, slot::Slot) = XXX() #  nothing doing
                      
 ## Button (PushButton alias)
-Button(parent::QtWidget) = PushButton(parent) # alias
-function Button(parent::QtWidget, text::MaybeString, image::Union(Nothing, Icon))
-    btn = Button(parent)
+function Button(parent::QtWidget, text::MaybeString=nothing, image::Union(Nothing, Icon)=nothing)
+    btn = PushButton(parent)
     if isa(text, String) set_value(btn, text) end
     if isa(image, Icon) setIcon(btn, image) end
     btn
 end
-Button(parent::QtWidget, text::String) = Button(parent, text, nothing)
-Button(parent::QtWidget, icon::Icon) = Button(parent, nothing, icon)
+
 get_value(widget::PushButton) = text(widget)
 set_value(widget::PushButton, value::String) = setText(widget, value)
 change_slot(widget::PushButton, slot::Function) = qconnect(widget, :pressed, () -> slot(get_value(widget)))
     
 ## Slider
 ## Need integers here
-function Slider{T <: Integer}(parent::QtWidget, orientation::String, range::Union(Range{T}, Range1{T}))
+function Slider{T <: Integer}(parent::QtWidget, orientation::String, range::Union(Range{T}, UnitRange{T}))
     sl = Slider(parent)
     setOrientation(sl, orientation)
     set_items(sl, range)
-    set_value(sl, min(range))
+    set_value(sl, minimum(range))
     sl
 end
-Slider(parent::QtWidget,  range::Union(Range, Range1)) = Slider(parent, "Horizontal", range)
+Slider(parent::QtWidget,  range::Union(Range, UnitRange)) = Slider(parent, "Horizontal", range)
 setOrientation(widget::Slider, orientation::String) = qinvoke(widget, :setOrientation, qt_enum(orientation)) ## Horizontal, Vertical
 
 get_value(widget::Slider) = value(widget)
 set_value(widget::Slider, value) = setValue(widget, value)
-function set_items(widget::Slider, items::Union(Range, Range1))
-    qinvoke(widget, :setRange, min(items), max(items))
+function set_items(widget::Slider, items::Union(Range, UnitRange))
+    qinvoke(widget, :setRange, minimum(items), maximum(items))
     qinvoke(widget, :setPageStep, step(items))
 end
 change_slot(widget::Slider, slot::Slot) = qconnect(widget, :valueChanged, project(slot))
                      
 ## SpinBox
-function SpinBox{T <: Integer}(parent::QtWidget, range::Union(Range{T}, Range1{T}))
+function SpinBox{T <: Integer}(parent::QtWidget, range::Union(Range{T}, UnitRange{T}))
     sp = SpinBox(parent)
     set_items(sp, range)
-    set_value(sp, min(range))
+    set_value(sp, minimum(range))
     sp
 end
 
 get_value(widget::SpinBox) = value(widget)
 set_value(widget::SpinBox, value) = setValue(widget, value)
-function set_items{T <: Integer}(widgets::SpinBox, items::Union(Range{T}, Range1{T})) 
-    qinvoke(widget, :setRange, min(items), max(items))
+function set_items{T <: Integer}(widgets::SpinBox, items::Union(Range{T}, UnitRange{T})) 
+    qinvoke(widget, :setRange, minimum(items), maximum(items))
     qinvoke(widget, :setSingleStep, step(items))
 end
 change_slot(widget::SpinBox, slot::Slot) = qconnect(widget, :valueChanged, project(slot))
@@ -491,7 +489,7 @@ end
 set_value(widget::ComboBox, value::Integer) = qinvoke(widget, :setCurrentIndex, value-1)
 function set_value(widget::ComboBox, value::String)
     items = get_items(widget)
-    if contains(items, value)
+    if any(items .== value)
         idx = findin(items, [value])[1]
     else
         idx = 0
@@ -553,7 +551,9 @@ function Menu(title::String, parent::AWidget)
     menu
 end
 
-function Action(text::MaybeString, icon::MaybeString,   shortcut::MaybePyObject, tooltip::MaybeString, parent::AWidget)
+function Action(parent::AWidget, text::MaybeString, icon::MaybeString=nothing,
+                shortcut::MaybePyObject=nothing, tooltip::MaybeString=nothing
+                )
     a = Action(parent)
     if !isa(text, Nothing)  setText(a, text) end
     if !isa(icon, Nothing)  setIcon(a, icon) end
@@ -561,16 +561,13 @@ function Action(text::MaybeString, icon::MaybeString,   shortcut::MaybePyObject,
     if !isa(tooltip, Nothing)  setToolTip(a, tooltip) end
     a
 end
-Action(text::String, parent::AWidget) = Action(text, nothing, nothing, nothing, parent)
-Action(text::String, icon::String, parent::AWidget) = Action(text, icon, nothing, nothing, parent)
-Action(text::String, icon::String, shortcut::PyObject, parent::AWidget) = Action(text, icon, shortcut, nothing, parent)
 change_slot(parent::Action, slot::Slot) = qconnect(parent, :triggered, slot)
 
 ## dialogs, don't have classes
 
 ## Message Box
 ## icon is symbol in :NoIcon, :Question, :Information, :Warning, :Critical
-function MessageBox(parent, title::MaybeString, text::MaybeString, informative_text::MaybeString, icon::MaybeSymbol)
+function MessageBox(parent, text::MaybeString=nothing; title::MaybeString=nothing, informative_text::MaybeString=nothing, icon::MaybeSymbol=nothing)
     mb = Qt.QMessageBox(project(parent))
     if !isa(title, Nothing) setWindowTitle(mb, title) end
     if !isa(text, Nothing) setText(mb, text) end
@@ -579,13 +576,8 @@ function MessageBox(parent, title::MaybeString, text::MaybeString, informative_t
     convert(Function, mb[:exec])()
 end
 
-MessageBox(parent::AWidget, text::String) = MessageBox(parent, nothing, text, nothing, nothing)
-MessageBox(parent::AWidget, text::String, icon::Symbol) = MessageBox(parent, nothing, text, nothing, icon)
-MessageBox(parent::AWidget, title::String, text::String) = MessageBox(parent, title, text, nothing, nothing)
-MessageBox(parent::AWidget, title::String, text::String, informative_text::String) = MessageBox(parent, title, text, informative_text, nothing)
-
 ## InputDialog
-function InputDialog(parent,  title::MaybeString, label::MaybeString, initial::MaybeString)
+function InputDialog(parent, initial::MaybeString=nothing; title::MaybeString=nothing, label::MaybeString=nothing)
     dlg = Qt.QInputDialog(parent)
     if !isa(title, Nothing)   setWindowTitle(dlg, title)  end
     if !isa(label, Nothing)   dlg[:setLabelText](label)   end

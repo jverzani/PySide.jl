@@ -20,13 +20,13 @@ submenu = Menu("File", mb)
 addMenu(mb, submenu)
 
 ## add action
-act = Action("Action", w)
+act = Action(w, "Action")
 change_slot(act, () -> print("action triggered"))
 addAction(submenu, act)
 
 
 ## add action with icon
-act = Action("Icon",  w)
+act = Action(w, "Icon")
 setIcon(act, Icon("/tmp/julia.gif"))   # nothing on the Mac
 change_slot(act, () -> print("icon action"))
 addAction(submenu, act)
@@ -36,7 +36,7 @@ addAction(submenu, act)
 addSeparator(submenu)
 
 ## add checkbutton
-cb = Action("checkable", w)
+cb = Action(w, "checkable")
 cb[:setCheckable](true)
 change_slot(cb, () -> println("checkable ", cb[:isChecked]() ? "is checked" : "is not checked"))
 addAction(submenu, cb)
@@ -48,7 +48,7 @@ addSeparator(submenu)
 ## add radio group
 ag = ActionGroup(w)
 ag[:setExclusive](true)
-rbs = [Action(i, w) for i in ["Regular", "Medium", "Large"]]
+rbs = [Action(w, i) for i in ["Regular", "Medium", "Large"]]
 map(rbs) do i
   addAction(ag, i)
   addAction(submenu, i)
@@ -60,8 +60,8 @@ qconnect(ag, :triggered, (action) -> println(text(action)))
 
 ## do popup on obtn
 popup = Menu(btn)
-act = Action("fred", w)
-change_slot(act, () -> print("fred"))
+act = Action(w, "fred")
+change_slot(act, () -> println("fred"))
 addAction(popup, act)
 
 qconnect(btn, :customContextMenuRequested, (pt) ->  popup[:exec_](Qt.QCursor()[:pos]()))

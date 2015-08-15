@@ -2,7 +2,7 @@
 ## Here we illustrate its basic use.
 
 ## a timer instance
-timer = QtCore.QTimer()
+timer = QtCore[:QTimer]()
 
 ## add a callback
 i = 1

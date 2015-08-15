@@ -32,7 +32,7 @@ qt_enum(attr::Vector{ASCIIString}; how="|") = PyCall.pyeval(join(map(u -> "QtCor
 ## some converstion
 ## This seems unnecessary with PySide
 ## convert text to string ## this is python2 http://pyqt.sourceforge.net/Docs/PyQt4/gotchas.html#python-strings-qt-strings-and-unicode
-### from_QString(o::PyObject)  = pyeval("str(x)", {:x => o})
+### from_QString(o::PyObject)  = pyeval("str(x)", Dict([(:x, o)]))
 
 qexec(object::PyObject) = convert(Function, object[:exec])()
 
@@ -48,7 +48,9 @@ newclass_tpl = Mustache.template_from_file(Pkg.dir("PySide", "tpl", "newclass.tp
 function qnew_class(name::ASCIIString, parent::ASCIIString; meths=nothing)
     tmp = tempname() * ".py"
     io = open(tmp, "w")
-    d = {:NewClass=>name, :OldClass=>parent}
+    d = Dict{Symbol, Any}()
+    d[:NewClass] = name
+    d[:OldClass] = parent
     if !isa(meths, Nothing) d[:methods] = meths end
     out = Mustache.render(io, newclass_tpl, d)
     println(out)

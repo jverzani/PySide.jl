@@ -1,5 +1,5 @@
 ## An example showing how the QtWebKit functionality can be used within julia
-## This sets up two web view, one holding an editor and one for output
+## This sets up two web views, one holding an editor and one for output
 ## The output command can be clicked on which calls back into julia to update the
 ## code in the editor.
 
@@ -15,11 +15,11 @@ type SimpleGui
         parent = PySide.project(parent)
         ace = PySide.QtWebKit.QWebView(parent)
         f = "file:///" * Pkg.dir("PySide", "tpl", "ace.html")
-        qinvoke(ace, :load, QtCore.QUrl(f))
+        qinvoke(ace, :load, QtCore[:QUrl](f))
 
         output =  PySide.QtWebKit.QWebView(parent)
         f = "file:///" * Pkg.dir("PySide", "tpl", "output.html")
-        qinvoke(output, :load, QtCore.QUrl(f))
+        qinvoke(output, :load, QtCore[:QUrl](f))
 
         sp = Splitter("Vertical", parent)
         addWidget(sp, ace)
@@ -52,7 +52,8 @@ end
 end
 
  ## using QtWebKit to make a simple interface
-using Mustache, GoogleCharts, JSON
+ using Mustache,  JSON
+# using GoogleCharts
 using PySide
 reload(Pkg.dir("PySide", "examples", "Evaluate.jl"))
 using Evaluate
@@ -65,12 +66,6 @@ prepare_out(x::Any) = ("<div class=\"alert alert-error\">$(x)</div>", nothing)
 prepare_out(x::Nothing) = ("", nothing)
 prepare_out(x::Function) = prepare_out(nothing)
 
-function prepare_out(x::GoogleCharts.CoreChart)
-    d = {:id => x.id, :width => 400, :height => 300, :chart_data => x.data,
-          :chart_options => to_json(x.options), :chart_type => x.chart_type}
-     (Mustache.render("<div id=\"{{:id}}\" style=\"width: {{:width}}px; height:{{:height}}px;\"></div>", d),
-      Mustache.render("var {{:id}}_data = {{{:chart_data}}};var {{:id}}_options = {{{:chart_options}}};var {{:id}}_chart = new google.visualization.{{:chart_type}}(document.getElementById('{{:id}}'));{{:id}}_chart.draw({{:id}}_data,  {{:id}}_options);", d))
-end
 
 function eval_parsed_block(expr)
     ## warp Evaluate.exec_cmd in try/catch
@@ -122,7 +117,7 @@ qinvoke(w, :addToolBar, tb)
 
 
 ## ## Integration of JavaScript -> julia
-qnew_class("Julia", "QtCore.QObject", meths=[{:meth_dfn => "evaluate = QtCore.Signal(str)"}])
+qnew_class("Julia", "QtCore.QObject", meths=[Dict([(:meth_dfn, "evaluate = QtCore.Signal(str)")])])
 julia = qnew_class_instance("Julia")
 qconnect(julia, :evaluate) do cmd
   SG.setValue(sg, cmd)

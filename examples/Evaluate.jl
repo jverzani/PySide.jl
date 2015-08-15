@@ -7,7 +7,7 @@ export parseit, exec_cmd
 # A special module in which a documents code is executed.
 module WeaveSandbox
     # Replace OUTPUT_STREAM references so we can capture output.
-    OUTPUT_STREAM = IOString()
+    OUTPUT_STREAM = IOBuffer()
     print(x) = Base.print(OUTPUT_STREAM, x)
     println(x) = Base.println(OUTPUT_STREAM, x)
 end

@@ -41,7 +41,8 @@ setText(btn, "Click me")
 push!(lyt, btn)
 
 qconnect(btn, :clicked) do
-  MessageBox(btn, "Hi there", :Information)
+    println("Hi htere")
+  MessageBox(btn, "Hi there", icon=:Information)
 end
 
 raise(w)

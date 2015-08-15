@@ -118,11 +118,11 @@ end
 cb = ComboBox(w)
 set_items(cb, ["none", "Function", "PyObject", "Module"])
 qconnect(cb, :activated) do idx
-   di = {"none" => nothing,
-         "Function" => u -> isa(u, Function),
-         "PyObject" => u -> isa(u, PyCall.PyObject),
-         "Module" => u -> isa(u, Module)
-         }
+   di = Dict([("none", nothing),
+              ("Function", u -> isa(u, Function)),
+              ("PyObject", u -> isa(u, PyCall.PyObject)),
+              ("Module", u -> isa(u, Module))]
+         )
 
     val = get_value(cb)
 
@@ -131,7 +131,7 @@ qconnect(cb, :activated) do idx
     update(view)
 end
 
-flyt = FormLayout(w)
+flyt = FormLayout(nothing)
 flyt[:setAlignment](qt_enum(["AlignLeft", "AlignTop"], how="|"))
 addLayout(lyt, flyt)
 

@@ -1,5 +1,5 @@
 using PySide
-require(Pkg.dir("PySide", "examples", "DThree.jl"))
+reload(Pkg.dir("PySide", "examples", "DThree.jl"))
 
 ## This is an attempt to integrate D3 graphics with julia via QtWebView.
 ## The performance is *surpringly* poor due to really slow passing of JavaScript
@@ -34,13 +34,14 @@ push!(w, d3.web)
 raise(w)
 
 data = [4, 8, 15, 16, 23, 42]
-d3.eval_js("var data = $(to_json(data));")
+
+d3.eval_js("var data = $(json(data));")
 d3.select("body").append("div").attr("class", "chart").render("chart")
 ## initial part of demo
-#d3.receiver("chart").selectAll("div").data(I("data")).enter().append("div").style("width", I("function(d) { return d * 10 + \"px\"; }")).text(I("function(d) { return d; }")).render()
+d3.receiver("chart").selectAll("div").data(AsIs("data")).enter().append("div").style("width", AsIs("function(d) { return d * 10 + \"px\"; }")).text(AsIs("function(d) { return d; }")).render()
 ## using a scale instead
-d3.scale_linear().domain([0, max(data)]).range(["0px", "420px"]).render("x")
-d3.receiver("chart").selectAll("div").data(I("data")).enter().append("div").style("width",I("x")).text(I("String")).render()
+d3.scale_linear().domain([0, maximum(data)]).range(["0px", "420px"]).render("x")
+d3.receiver("chart").selectAll("div").data(AsIs("data")).enter().append("div").style("width",AsIs("x")).text(AsIs("String")).render()
 
 
 ## A scatterplot example following http://ofps.oreilly.com/titles/9781449339739/
@@ -72,8 +73,8 @@ style = "
 
     d3.select("body").append("svg").attr("width", width).attr("height", height).render("svg")
     ## scales
-    d3.scale_linear().domain([min(x),max(x)]*1.1).range([0, width]).render("xScale")
-    d3.scale_linear().domain([min(y),max(y)]*1.1).range([height, 0]).render("yScale")
+    d3.scale_linear().domain([minimum(x),maximum(x)]*1.1).range([0, width]).render("xScale")
+    d3.scale_linear().domain([minimum(y),maximum(y)]*1.1).range([height, 0]).render("yScale")
     ## axes
     d3.svg_axis().scale(I"xScale").orient("bottom").render("xAxis")
     d3.receiver("svg").append("g").attr("class", "axis").attr("transform", "translate(0,$(height - padding))").call(I"xAxis").render()
@@ -82,7 +83,7 @@ style = "
 
         ## add points. This takes seconds for even 250 points....
                                                                         
-    d3.receiver("svg").selectAll("circle").data(I(dataset)).enter().append("circle").
-       attr("cx", I("function(d) {return xScale(d[0])}")).
-       attr("cy", I("function(d) {return yScale(d[1])}")).
+    d3.receiver("svg").selectAll("circle").data(AsIs(dataset)).enter().append("circle").
+       attr("cx", AsIs("function(d) {return xScale(d[0])}")).
+       attr("cy", AsIs("function(d) {return yScale(d[1])}")).
        attr("r", 5).render()

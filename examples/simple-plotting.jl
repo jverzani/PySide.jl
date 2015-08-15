@@ -158,8 +158,8 @@ t = linspace(0, 4pi, 512);
 x = sin(t);
 y = 0.1t.*cos(t);
 
-xlim = [min(x), max(x)] * 1.05
-ylim = [min(y), max(y)] * 1.05
+xlim = [minimum(x), maximum(x)] * 1.05
+ylim = [minimum(y), maximum(y)] * 1.05
 
 w = Widget()
 view, scene = PlotView(w)
@@ -167,7 +167,7 @@ push!(w, view)
 raise(w)
 
 i = 1
-timer = QtCore.QTimer()
+timer = QtCore[:QTimer]()
 qconnect(timer, :timeout) do
 global i
 if i == 512

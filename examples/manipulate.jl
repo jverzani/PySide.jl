@@ -1,6 +1,8 @@
-## A manipuate like widget
+## A manipulate like widget
 ## this follows the interface of RStudio's manipulate, which is likely following that of
 ## Mathematica's
+
+## This is *not* the manipulate of Interact.jl!
 
 using Winston ## Winston *must* load before PySide, this is flaky
 using PySide
@@ -42,8 +44,8 @@ end
 
 
 slider(nm::String, label::String, rng::Range1, initial::Integer) = SliderWidget(nothing, nm, label, initial, rng)
-slider(nm::String, label::String, rng::Range1) = slider(nm, label, rng, min(rng))
-slider(nm::String,  rng::Union(Range, Range1)) = slider(nm, nm, rng, min(rng))
+slider(nm::String, label::String, rng::Range1) = slider(nm, label, rng, minimum(rng))
+slider(nm::String,  rng::Union(Range, Range1)) = slider(nm, nm, rng, minimum(rng))
 
 function make_widget(parent, widget::SliderWidget)
     sl = Slider(parent, "Horizontal", widget.rng)

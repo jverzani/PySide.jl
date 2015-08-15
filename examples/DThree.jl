@@ -1,7 +1,7 @@
 ## silly module to emulate D3 syntax. 
 module DThree
 
- export I, @I_str, D3
+export AsIs, @I_str, D3
 
 using JSON
 using PyCall
@@ -14,9 +14,9 @@ tpl = Mustache.template_from_file(Pkg.dir("PySide", "tpl", "d3.html"))
 type AsIs
     x
 end
-I(x) = AsIs(x)
+
 macro I_str(x)
-    I(x)
+    AsIs(x)
 end
 
 ## Take a function, get its args as array of symbols. There must be better way...
@@ -54,7 +54,7 @@ end
 ## tojson(x::AsIs) = string(x.x)
 ## tojson(x::Tupe) = to_json([tojson(x) for x in x])
 
-prep(d3, x::Any) = to_json(x)
+prep(d3, x::Any) = json(x)
 prep(d3, x::AsIs) = string(x.x)
 function prep(d3, f::Function)
     ## much trickier. We have julia object pushed into webpage which callback to this function
@@ -71,10 +71,10 @@ end
 ## render passes JavaScript to browser. If you want to assign to variable name, pass as argument.
 ## If method not defined, then can do something like d3._(:selectAll, "p"). ...
 ## by default this uses JavaScript d3 object as receiver. This can be changed with d3.receiver("chart"). ...
-## arguments are converted via to_json, except:
+## arguments are converted via json, except:
 ## * functions are treated as callbacks into julia. These are asynchronous.
-## * use I"x" or I("x") to treat object "as is". This is needed to quote JavaScript functions
-## TODO: PyCall this baby so members can be added from a list of symbols
+## * use I"x" or AsIs("x") to treat object "as is". This is needed to quote JavaScript functions
+## TODO: generate these so members can be added from a list of symbols
 type D3
     web
     cmd
@@ -107,24 +107,24 @@ type D3
         tmp = tempname() * ".html"
 
         io = open(tmp, "w")
-        Mustache.render(io, tpl, {:style => style, :dataset=>dataset})
+        Mustache.render(io, tpl, Dict([(:style, style), (:dataset, dataset)]))
         close(io)
 
         
         qconnect(web, :loadFinished, (bool) -> this.loaded = bool)
-        qinvoke(web, :load, QtCore.QUrl("file:///" * tmp))
+        qinvoke(web, :load, QtCore[:QUrl]("file:///" * tmp))
         
 
         this.receiver = (value) -> begin this.cmd = value; this end
         this.eval_js = (value) -> begin
-            println(value)
+            #println(value)
             ## a bit kludgey, making sure page is loaded before evaluating
             if this.loaded
                 this.web[:page]()[:currentFrame]()[:evaluateJavaScript](value)
                 return(nothing)
             else
                 ctr, max_steps = 1, 100
-                timer = QtCore.QTimer()
+                timer = QtCore[:QTimer]()
                 qconnect(timer, :timeout) do
                   ctr += 1
                   if this.loaded
