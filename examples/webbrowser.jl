@@ -13,11 +13,11 @@ type SimpleGui
     output
     function SimpleGui(parent)
         parent = PySide.project(parent)
-        ace = PySide.QtWebKit.QWebView(parent)
+        ace = PySide.QtWebKit[:QWebView](parent)
         f = "file:///" * Pkg.dir("PySide", "tpl", "ace.html")
         qinvoke(ace, :load, QtCore[:QUrl](f))
 
-        output =  PySide.QtWebKit.QWebView(parent)
+        output =  PySide.QtWebKit[:QWebView](parent)
         f = "file:///" * Pkg.dir("PySide", "tpl", "output.html")
         qinvoke(output, :load, QtCore[:QUrl](f))
 
@@ -104,13 +104,13 @@ setCentralWidget(w, sg.block)
 ## ## Define some actions
 ## evaluate ... Qt.QKeySequence("Ctrl+X, Ctrl+C");
 ## reload ...
-evaluate_action = Qt.QAction(PySide.project(w))
+evaluate_action = Qt[:QAction](PySide.project(w))
 qinvoke(evaluate_action, :setText, "evaluate")
-qinvoke(evaluate_action, :setShortcut, Qt.QKeySequence("Open")) ## This fails!!
+qinvoke(evaluate_action, :setShortcut, Qt[:QKeySequence]("Open")) ## This fails!!
 qinvoke(evaluate_action, :setStatusTip, "Evaluate buffer contents")
 qconnect(evaluate_action, :triggered, eval_block)
 
-tb = Qt.QToolBar(PySide.project(w))
+tb = Qt[:QToolBar](PySide.project(w))
 qinvoke(tb, :addAction, evaluate_action)
 qinvoke(w, :addToolBar, tb)
 

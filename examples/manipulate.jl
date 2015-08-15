@@ -14,13 +14,13 @@ end
 function render(parent::Label, p::Winston.FramedPlot)
     nm = tempname() * ".png"
     file(p, nm)
-    setPixmap(parent, Qt.QPixmap(nm))
+    setPixmap(parent, Qt[:QPixmap](nm))
 end
 
 function render(parent::Label, p::Winston.FramedPlot)
     nm = tempname() * ".png"
     file(p, nm)
-    setPixmap(parent, Qt.QPixmap(nm))    
+    setPixmap(parent, Qt[:QPixmap](nm))    
 end
 
 

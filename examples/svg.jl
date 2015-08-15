@@ -8,7 +8,7 @@ w = Widget()
 lyt = VBoxLayout(w)
 setLayout(w, lyt)
 
-sv = QtSvg.QSvgWidget(w.w)
+sv = QtSvg[:QSvgWidget](w.w)
 addWidget(lyt, sv)
 
 sl = Slider(w, "Horizontal", 2:10)

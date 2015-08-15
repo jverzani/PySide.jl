@@ -1,35 +1,19 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__(false)
+VERSION >= v"0.4.0-dev+6521" && __precompile__(true) # still stakes 7+seconds, as pyimport is not sped up.
 module PySide
 
 ##################################################
 ## initialize
 using PyCall
 using Mustache
-using Requires
+using DataFrames
 
-
-## 
-@pyimport PySide.QtGui    as Qt
-QtCore = pyimport("PySide.QtCore")
-@pyimport PySide.QtSvg    as QtSvg
-@pyimport PySide.QtWebKit as QtWebKit
-@pyimport sys
 
 import Base.getindex, Base.setindex!, Base.push!, Base.pop!, Base.delete!
-
-
-
-
-
-
 
 include("utils.jl")
 include("qtutils.jl")
 include("qtextras.jl")
-
-@require DataFrames begin
-    include(Pkg.dir("PySide", "src", "data-frame-model.jl"))
-end
+include("data-frame-model.jl")
 
 ## replace this
 ##include("pyqtgraph.jl")  
@@ -89,14 +73,29 @@ export setFocus, raise
 
 
 
+function __init__()
 
+    global const Qt = pyimport("PySide.QtGui")
+    global const QtCore = pyimport("PySide.QtCore")
+    global const QtSvg = pyimport("PySide.QtSvg")
+    global const QtWebKit = pyimport("PySide.QtWebKit")
+    global const QtNamespace = QtCore["Qt"]
+    sys = pyimport("sys")
+    
 
-## use PyCall's start gui
-pygui(:qt)
-PyCall.eventloops[:qt] = PyCall.qt_eventloop("PySide", 50e-3)
-app = Qt.QApplication(sys.argv)
+    ## combining enums require us to work in python:
+    if PyCall.pyversion < v"3" 
+        PyCall.pyeval("execfile(x, globals())", x = Pkg.dir("PySide", "tpl", "imports.tpl")) 
+    else 
+        PyCall.pyeval("exec(open(x, 'rb').read(), globals())", x = Pkg.dir("PySide", "tpl", "imports.tpl"))
+    end
 
+    ## use PyCall's start gui
+    pygui(:qt)
+    PyCall.eventloops[:qt] = PyCall.qt_eventloop("PySide", 50e-3)
+    app = Qt[:QApplication](sys[:argv])
 
+end
 
 
 end

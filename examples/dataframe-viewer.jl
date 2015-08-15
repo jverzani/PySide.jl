@@ -16,7 +16,7 @@ m = StandardItemModel(w)
 ## currently no set_items method to populate from a data frame, so we
 ## do it at the Qt level
 for row in 1:nrow(d), col in 1:ncol(d)
-    Qt.QStandardItem(string(d[row, col])) | item -> m[:setItem](row-1, col-1, item)
+    Qt[:QStandardItem](string(d[row, col])) | item -> m[:setItem](row-1, col-1, item)
 end
 
 view = TableView(w)

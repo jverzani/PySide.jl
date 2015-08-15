@@ -9,7 +9,7 @@ w = Widget()
 setWindowTitle(w, "Example")
 
 
-lcd = Qt.QLCDNumber(w.w)
+lcd = Qt[:QLCDNumber](w.w)
 sld = Slider(w)
 btn = Button(w)
 setText(btn, "click me")

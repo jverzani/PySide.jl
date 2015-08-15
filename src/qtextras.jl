@@ -7,43 +7,43 @@ Slot = Union(AWidget, Function)
 
 
 ## How to make these types programmatically?
-type MainWindow <: QtWidget w::PyObject;  MainWindow(parent) = new(Qt.QMainWindow(project(parent))) end
-type DockWidget <: QtWidget w::PyObject;  DockWidget(parent) = new(Qt.QDockWidget(project(parent))) end
-type Widget     <: QtWidget w::PyObject;  Widget(parent)     = new(Qt.QWidget(project(parent)))     end
-type Icon       <: QtWidget w::PyObject;  Icon(parent)       = new(Qt.QIcon(project(parent)))       end
-type Label      <: QtWidget w::PyObject;  Label(parent)      = new(Qt.QLabel(project(parent)))      end
-type PushButton <: QtWidget w::PyObject;  PushButton(parent) = new(Qt.QPushButton(project(parent))) end
-type Slider     <: QtWidget w::PyObject;  Slider(parent)     = new(Qt.QSlider(project(parent)))     end
-type SpinBox    <: QtWidget w::PyObject;  SpinBox(parent)    = new(Qt.QSpinBox(project(parent)))    end
-type LineEdit   <: QtWidget w::PyObject;  LineEdit(parent)   = new(Qt.QLineEdit(project(parent)))   end
-type TextEdit   <: QtWidget w::PyObject;  TextEdit(parent)   = new(Qt.QTextEdit(project(parent)))   end
-type CheckBox   <: QtWidget w::PyObject;  CheckBox(parent)   = new(Qt.QCheckBox(project(parent)))   end
-type RadioButton<: QtWidget w::PyObject;  RadioButton(parent)= new(Qt.QRadioButton(project(parent)))end    
-type ComboBox   <: QtWidget w::PyObject;  ComboBox(parent)   = new(Qt.QComboBox(project(parent)))   end
-type TableView  <: QtWidget w::PyObject;  TableView(parent)  = new(Qt.QTableView(project(parent)))  end
+type MainWindow <: QtWidget w::PyObject;  MainWindow(parent) = new(Qt[:QMainWindow](project(parent))) end
+type DockWidget <: QtWidget w::PyObject;  DockWidget(parent) = new(Qt[:QDockWidget](project(parent))) end
+type Widget     <: QtWidget w::PyObject;  Widget(parent)     = new(Qt[:QWidget](project(parent)))     end
+type Icon       <: QtWidget w::PyObject;  Icon(parent)       = new(Qt[:QIcon](project(parent)))       end
+type Label      <: QtWidget w::PyObject;  Label(parent)      = new(Qt[:QLabel](project(parent)))      end
+type PushButton <: QtWidget w::PyObject;  PushButton(parent) = new(Qt[:QPushButton](project(parent))) end
+type Slider     <: QtWidget w::PyObject;  Slider(parent)     = new(Qt[:QSlider](project(parent)))     end
+type SpinBox    <: QtWidget w::PyObject;  SpinBox(parent)    = new(Qt[:QSpinBox](project(parent)))    end
+type LineEdit   <: QtWidget w::PyObject;  LineEdit(parent)   = new(Qt[:QLineEdit](project(parent)))   end
+type TextEdit   <: QtWidget w::PyObject;  TextEdit(parent)   = new(Qt[:QTextEdit](project(parent)))   end
+type CheckBox   <: QtWidget w::PyObject;  CheckBox(parent)   = new(Qt[:QCheckBox](project(parent)))   end
+type RadioButton<: QtWidget w::PyObject;  RadioButton(parent)= new(Qt[:QRadioButton](project(parent)))end    
+type ComboBox   <: QtWidget w::PyObject;  ComboBox(parent)   = new(Qt[:QComboBox](project(parent)))   end
+type TableView  <: QtWidget w::PyObject;  TableView(parent)  = new(Qt[:QTableView](project(parent)))  end
 ## XXX
-type Action     <: QtWidget w::PyObject;  Action(parent)     = new(Qt.QAction(project(parent)))     end
-type ActionGroup   <: QtWidget w::PyObject;  ActionGroup(parent)   = new(Qt.QActionGroup(project(parent)))   end
-type MenuBar    <: QtWidget w::PyObject;  MenuBar(parent)    = new(Qt.QMenuBar(project(parent)))    end
-type Menu       <: QtWidget w::PyObject;  Menu(parent)       = new(Qt.QMenu(project(parent)))       end
+type Action     <: QtWidget w::PyObject;  Action(parent)     = new(Qt[:QAction](project(parent)))     end
+type ActionGroup   <: QtWidget w::PyObject;  ActionGroup(parent)   = new(Qt[:QActionGroup](project(parent)))   end
+type MenuBar    <: QtWidget w::PyObject;  MenuBar(parent)    = new(Qt[:QMenuBar](project(parent)))    end
+type Menu       <: QtWidget w::PyObject;  Menu(parent)       = new(Qt[:QMenu](project(parent)))       end
 
-type GraphicsScene <: QtWidget w::PyObject;  GraphicsScene(parent)       = new(Qt.QGraphicsScene(project(parent)))       end
-type GraphicsView <: QtWidget w::PyObject;  GraphicsView(parent)       = new(Qt.QGraphicsView(project(parent)))       end
-
-
-type VBoxLayout <: QtLayout w::PyObject;  VBoxLayout(parent) = new(Qt.QVBoxLayout(project(parent))) end
-type HBoxLayout <: QtLayout w::PyObject;  HBoxLayout(parent) = new(Qt.QHBoxLayout(project(parent))) end
-type FormLayout <: QtLayout w::PyObject;  FormLayout(parent) = new(Qt.QFormLayout(project(parent))) end
-type GridLayout <: QtLayout w::PyObject;  GridLayout(parent) = new(Qt.QGridLayout(project(parent))) end
-type TabWidget  <: QtLayout w::PyObject;  TabWidget(parent)  = new(Qt.QTabWidget(project(parent))) end
-type Splitter   <: QtLayout w::PyObject;  Splitter(parent)   = new(Qt.QSplitter(project(parent))) end
-type StackedLayout <: QtLayout w::PyObject;  StackedLayout(parent) = new(Qt.QStackedLayout(project(parent))) end
-
-type ButtonGroup<: QtWidget w::PyObject;  ButtonGroup(parent)= new(Qt.QButtonGroup(project(parent)))end
-type GroupBox   <: QtWidget w::PyObject;  GroupBox(parent)   = new(Qt.QGroupBox(project(parent)))   end
+type GraphicsScene <: QtWidget w::PyObject;  GraphicsScene(parent)       = new(Qt[:QGraphicsScene](project(parent)))       end
+type GraphicsView <: QtWidget w::PyObject;  GraphicsView(parent)       = new(Qt[:QGraphicsView](project(parent)))       end
 
 
-type Pixmap     <: QtWidget w::PyObject;  Pixmap(parent)     = new(Qt.QPixmap(project(parent)))    end
+type VBoxLayout <: QtLayout w::PyObject;  VBoxLayout(parent) = new(Qt[:QVBoxLayout](project(parent))) end
+type HBoxLayout <: QtLayout w::PyObject;  HBoxLayout(parent) = new(Qt[:QHBoxLayout](project(parent))) end
+type FormLayout <: QtLayout w::PyObject;  FormLayout(parent) = new(Qt[:QFormLayout](project(parent))) end
+type GridLayout <: QtLayout w::PyObject;  GridLayout(parent) = new(Qt[:QGridLayout](project(parent))) end
+type TabWidget  <: QtLayout w::PyObject;  TabWidget(parent)  = new(Qt[:QTabWidget](project(parent))) end
+type Splitter   <: QtLayout w::PyObject;  Splitter(parent)   = new(Qt[:QSplitter](project(parent))) end
+type StackedLayout <: QtLayout w::PyObject;  StackedLayout(parent) = new(Qt[:QStackedLayout](project(parent))) end
+
+type ButtonGroup<: QtWidget w::PyObject;  ButtonGroup(parent)= new(Qt[:QButtonGroup](project(parent)))end
+type GroupBox   <: QtWidget w::PyObject;  GroupBox(parent)   = new(Qt[:QGroupBox](project(parent)))   end
+
+
+type Pixmap     <: QtWidget w::PyObject;  Pixmap(parent)     = new(Qt[:QPixmap](project(parent)))    end
     
 
 ## inovke a method with args
@@ -366,7 +366,7 @@ end
 function set_items(widget::LineEdit, items=Vector)
     completer = qinvoke(widget, :completer)
     if isa(completer, Nothing)
-        completer = Qt.QCompleter(project(widget))
+        completer = Qt[:QCompleter](project(widget))
         qinvoke(widget, :setCompleter, completer)
     end
 
@@ -413,7 +413,7 @@ type RadioGroup <: QtWidget
 end
 function RadioGroup{T <: String}(w::Widget, labels::Vector{T}, selected::Integer, orientation::String)
     bgp = ButtonGroup(w)
-    gp = Qt.QGroupBox(project(w))
+    gp = Qt[:QGroupBox](project(w))
     rg = RadioGroup(gp, bgp)
     
     lyt = orientation == "Horizontal" ? HBoxLayout(gp) : VBoxLayout(gp)
@@ -513,7 +513,7 @@ type StandardItemModel <: QtWidget
     w::PyObject
     function StandardItemModel(parent)
         isaStandardItemModel(parent) = ismatch(r"StandardItemModel", string(qinvoke(parent, :__class__)))
-        isaStandardItemModel(parent) ? new(project(parent)) : new(Qt.QStandardItemModel(project(parent)))
+        isaStandardItemModel(parent) ? new(project(parent)) : new(Qt[:QStandardItemModel](project(parent)))
     end
 end
 
@@ -526,14 +526,14 @@ end
 
 function set_items{T <: String}(model::StandardItemModel, items::Vector{T})
     qinvoke(model, :clear)
-    map(i -> qinvoke(model, :setItem, i-1, Qt.QStandardItem(items[i])),  1:length(items))
+    map(i -> qinvoke(model, :setItem, i-1, Qt[:QStandardItem](items[i])),  1:length(items))
 end
 
 ## set icon with label, value, icon
 function set_items{S <: String, T<:String}(model::StandardItemModel, items::Vector{S}, labels::Vector{T}, icon::Vector{Icon})
     qinvoke(model, :clear)
     for i in 1:length(items)
-        item = Qt.QStandardItem(labels[i])
+        item = Qt[:QStandardItem](labels[i])
         ## set data value from items[i]
         qinvoke(item, :setData, items[i])
         qinvoke(item, :setIcon, icon[i]) ## XXX Does this work?
@@ -568,7 +568,7 @@ change_slot(parent::Action, slot::Slot) = qconnect(parent, :triggered, slot)
 ## Message Box
 ## icon is symbol in :NoIcon, :Question, :Information, :Warning, :Critical
 function MessageBox(parent, text::MaybeString=nothing; title::MaybeString=nothing, informative_text::MaybeString=nothing, icon::MaybeSymbol=nothing)
-    mb = Qt.QMessageBox(project(parent))
+    mb = Qt[:QMessageBox](project(parent))
     if !isa(title, Nothing) setWindowTitle(mb, title) end
     if !isa(text, Nothing) setText(mb, text) end
     if !isa(informative_text, Nothing)  setInformativeText(mb, informative_text) end
@@ -578,7 +578,7 @@ end
 
 ## InputDialog
 function InputDialog(parent, initial::MaybeString=nothing; title::MaybeString=nothing, label::MaybeString=nothing)
-    dlg = Qt.QInputDialog(parent)
+    dlg = Qt[:QInputDialog](parent)
     if !isa(title, Nothing)   setWindowTitle(dlg, title)  end
     if !isa(label, Nothing)   dlg[:setLabelText](label)   end
     if !isa(initial, Nothing) dlg[:setTextValue](initial) end
@@ -588,7 +588,7 @@ end
 
 ## how: file, files, dir, save
 function FileDialog(parent, how::String, args...)
-    fd = Qt.QFileDialog()
+    fd = Qt[:QFileDialog]()
 
     if how == "file"
         out = fd[:getOpenFileName](parent, args...)

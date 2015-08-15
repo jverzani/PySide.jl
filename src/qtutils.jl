@@ -15,17 +15,11 @@ qcall(object::PyObject, member::Symbol, args...) = object[member](args...)
 
 ## get Qt.Qt.enum as pyobject (http://qt-project.org/doc/qt-4.8/qt.html)
 ## TODO: generelize to others by passing in second argument
-QtNamespace = pyimport("PySide.QtCore")["Qt"]
+
 qt_enum(attr::Symbol) = qt_enum(string(attr))
 qt_enum(attr::ASCIIString) = QtNamespace[attr] # want pyobject here
 
 
-## combining enums require us to work in python:
-if pyversion < v"3" 
-    PyCall.pyeval("execfile(x, globals())", x = Pkg.dir("PySide", "tpl", "imports.tpl")) 
-else 
-    PyCall.pyeval("exec(open(x, 'rb').read(), globals())", x = Pkg.dir("PySide", "tpl", "imports.tpl"))
-end
 
 qt_enum(attr::Vector{ASCIIString}; how="|") = PyCall.pyeval(join(map(u -> "QtCore.Qt.$u", attr), " $how "))
 

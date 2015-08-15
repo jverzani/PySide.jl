@@ -10,16 +10,16 @@
 using PySide
 
 
-w = Qt.QWidget()
+w = Qt[:QWidget]()
 w[:setWindowTitle]("Hello world example")
-lyt = Qt.QVBoxLayout(w)
+lyt = Qt[:QVBoxLayout](w)
 w[:setLayout](lyt)
 
-btn = Qt.QPushButton("Click me", w)
+btn = Qt[:QPushButton]("Click me", w)
 lyt[:addWidget](btn)
 
 qconnect(btn, :clicked) do
-  msg = Qt.QMessageBox(btn)
+  msg = Qt[:QMessageBox](btn)
   msg[:setWindowTitle]("A message for you...")
   msg[:setText]("Hello world!")
   msg[:setInformativeText]("Thanks for clicking.")

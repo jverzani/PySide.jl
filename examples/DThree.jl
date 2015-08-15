@@ -101,7 +101,7 @@ type D3
     call
     max
     function D3(parent::PyCall.PyObject, style::String,dataset::String)
-        web = PySide.QtWebKit.QWebView(parent)
+        web = PySide.QtWebKit[:QWebView](parent)
         this = new(web, "d3", false)        
 
         tmp = tempname() * ".html"

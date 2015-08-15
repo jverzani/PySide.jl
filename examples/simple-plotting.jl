@@ -20,37 +20,37 @@ function addPoint(sc::GraphicsScene, xs::Vector, ys::Vector, r;
         set_flags(item, ["ItemIsSelectable", "ItemIgnoresTransformations"])
         item
     end
-    pen = Qt.QPen(Qt.QColor(color))
+    pen = Qt[:QPen](Qt[:QColor](color))
     pen[:setStyle](qt_enum(pen_style))
     pen[:setWidth](lwd)
-    brush = Qt.QBrush(qt_enum("SolidPattern"))
+    brush = Qt[:QBrush](qt_enum("SolidPattern"))
     [add_point(xs[i], ys[i], r, pen, brush) for i in 1:length(xs)]
 end
     
 function addLine(sc::GraphicsScene, xs, ys;
                   lwd::Integer=1, pen_style::String="SolidLine", color::String="Black")
-    pen = Qt.QPen(Qt.QColor(color))
+    pen = Qt[:QPen](Qt[:QColor](color))
     pen[:setStyle](qt_enum(pen_style))
     pen[:setWidth](lwd)
-    brush = Qt.QBrush(qt_enum("SolidPattern"))
+    brush = Qt[:QBrush](qt_enum("SolidPattern"))
     [sc[:addLine](xs[i-1], ys[i-1], xs[i], ys[i], pen, brush) for i in 2:length(x)]
 end
 
 function addSegment(sc::GraphicsScene,  xs, ys, x1s, y1s;
                      lwd::Integer=1, pen_style::String="SolidLine", color::String="Black")
-    pen = Qt.QPen(Qt.QColor(color))
+    pen = Qt[:QPen](Qt[:QColor](color))
     pen[:setStyle](qt_enum(pen_style))
     pen[:setWidth](lwd)
-    brush = Qt.QBrush(qt_enum("SolidPattern"))
+    brush = Qt[:QBrush](qt_enum("SolidPattern"))
     [sc[:addLine](xs[i], ys[i], x1s[i], y1s[i], pen, brush) for i in 1:length(xs)]
 end
 
 function addPolygon(sc::GraphicsScene, xs, ys,
                      lwd::Integer=1, pen_style::String="SolidLine", color::String="Black")
-    pen = Qt.QPen(Qt.QColor(color))
+    pen = Qt[:QPen](Qt[:QColor](color))
     pen[:setStyle](qt_enum(pen_style))
     pen[:setWidth](lwd)
-    brush = Qt.QBrush()
+    brush = Qt[:QBrush]()
     
     pts = [QtCore.QPoint(xs[i], ys[i]) for i in 1:length(xs)]
     item = sc[:addPolygon](pts, pen, brush)
@@ -59,10 +59,10 @@ end
     
 function addRect(sc::GraphicsScene,  xs, ys, ws, hs,
                  lwd::Integer=1, pen_style::String="SolidLine", color::String="Black")
-    pen = Qt.QPen(Qt.QColor(color))
+    pen = Qt[:QPen](Qt[:QColor](color))
     pen[:setStyle](qt_enum(pen_style))
     pen[:setWidth](lwd)
-    brush = Qt.QBrush(qt_enum("SolidPattern"))
+    brush = Qt[:QBrush](qt_enum("SolidPattern"))
     
     [sc[:addRect](x[i], y[i], w[i], h1[i], pen, brush) for i in 1:length(xs)]
 end

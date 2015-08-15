@@ -1,6 +1,6 @@
 ## PySide 
 
-[This package does not seem to have any user base. Please use the issue tracker for bug reports.]
+> **NOTE** This package does not seem to have any user base. Please use the issue tracker for bug reports.
 
 A `julia` package connecting `julia` to the `Qt` UI framework via
 Steven G. Johnson's PyCall connection to `Python`

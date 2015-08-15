@@ -23,8 +23,8 @@ edit_role{T <: Real}(x::DataFrames.DataArray{T}, row::Int) = x[row]
 text_alignment_role(x::DataFrames.DataArray, row::Integer) = convert(Int, qt_enum("AlignLeft"))
 text_alignment_role{T <: Real}(x::DataFrames.DataArray{T}, row::Integer) = convert(Int, qt_enum("AlignRight"))
 
-background_role(x::DataFrames.DataArray, row::Integer) = Qt.QBrush(Qt.QColor(0,0,0,0))
-foreground_role(x::DataFrames.DataArray, row::Integer) = Qt.QBrush(Qt.QColor("black"))
+background_role(x::DataFrames.DataArray, row::Integer) = Qt[:QBrush](Qt[:QColor](0,0,0,0))
+foreground_role(x::DataFrames.DataArray, row::Integer) = Qt[:QBrush](Qt[:QColor]("black"))
 
 tool_tip_role(x::DataFrames.DataArray, row::Integer) = nothing
 whats_this_role(x::DataFrames.DataArray, row::Integer) = nothing
@@ -34,11 +34,11 @@ function make_role(r::String, value)
     if  r == "TextAlignmentRole"
         qt_enum(value)                  # "AlignRight"
     elseif r == "DecorationRole"
-        Qt.QIcon(value)                 # filename
+        Qt[:QIcon](value)                 # filename
     elseif r == "BackgroundRole"
-        Qt.QBrush(Qt.QColor(value))     # "blue"
+        Qt[:QBrush](Qt[:QColor](value))     # "blue"
     elseif r == "ForegroundRole"
-        Qt.QBrush(Qt.QColor(value))
+        Qt[:QBrush](Qt[:QColor](value))
     else
         value
     end

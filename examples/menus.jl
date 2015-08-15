@@ -64,7 +64,7 @@ act = Action(w, "fred")
 change_slot(act, () -> println("fred"))
 addAction(popup, act)
 
-qconnect(btn, :customContextMenuRequested, (pt) ->  popup[:exec_](Qt.QCursor()[:pos]()))
+qconnect(btn, :customContextMenuRequested, (pt) ->  popup[:exec_](Qt[:QCursor]()[:pos]()))
 btn[:setContextMenuPolicy](qt_enum("CustomContextMenu"))
 
 
